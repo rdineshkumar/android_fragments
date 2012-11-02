@@ -5,34 +5,23 @@
     android:orientation="vertical"
     android:padding="4dp" >
 
-    <TextView
+    <Button
+        android:id="@+id/button"
         style="@style/fragment_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Photo" />
+        android:text="Take Photo" />
 
-    <ImageView
+    <View
         android:layout_width="match_parent"
         android:layout_height="2dp"
-        android:src="@drawable/bg_separator" />
+        android:background="@drawable/bg_separator" />
 
-    <RelativeLayout
+    <ImageView
+        android:id="@+id/imageview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="10dp" >
-
-        <ImageView
-            android:id="@+id/imageview"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:adjustViewBounds="true" />
-
-        <Button
-            android:id="@+id/button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:text="Take Photo" />
-    </RelativeLayout>
+        android:adjustViewBounds="true"
+        android:paddingTop="10dp" />
 
 </LinearLayout>
