@@ -1,0 +1,8 @@
+<resources>
+
+    <string name="app_name">Fragments</string>
+    <string name="title_activity_main">Fragments Test</string>
+    <string name="subtitle_activity_main">Subtitle for Fragments Test</string>
+    <string name="spinner_prompt">Choose:</string>
+
+</resources>
