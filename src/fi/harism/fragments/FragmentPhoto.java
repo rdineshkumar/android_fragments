@@ -4,10 +4,11 @@ import java.io.File;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.graphics.drawable.Drawable;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,20 +16,27 @@ import android.widget.ImageView;
 
 public class FragmentPhoto extends Fragment implements View.OnClickListener {
 
-	private Drawable mPhoto;
-	private PhotoObserver mPhotoObserver;
+	private static final int ACTION_CODE = 100;
+
+	private boolean mPhotoTaken;
 	private Uri mPhotoUri;
 
 	@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-		mPhotoObserver = (PhotoObserver) activity;
-
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == ACTION_CODE && resultCode == Activity.RESULT_OK) {
+			ImageView imageView = (ImageView) getActivity().findViewById(
+					R.id.imageview);
+			imageView.setImageURI(null);
+			imageView.setImageURI(mPhotoUri);
+			mPhotoTaken = true;
+		}
 	}
 
 	@Override
 	public void onClick(View view) {
-		mPhotoObserver.onTakePhoto(mPhotoUri);
+		Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+		intent.putExtra(MediaStore.EXTRA_OUTPUT, mPhotoUri);
+		startActivityForResult(intent, ACTION_CODE);
 	}
 
 	@Override
@@ -48,28 +56,12 @@ public class FragmentPhoto extends Fragment implements View.OnClickListener {
 
 		view.findViewById(R.id.button).setOnClickListener(this);
 
-		ImageView imageView = (ImageView) view.findViewById(R.id.imageview);
-		imageView.setImageDrawable(mPhoto);
+		if (mPhotoTaken) {
+			ImageView imageView = (ImageView) view.findViewById(R.id.imageview);
+			imageView.setImageURI(mPhotoUri);
+		}
 
 		return view;
-	}
-
-	@Override
-	public void onDetach() {
-		super.onDetach();
-		ImageView imageView = (ImageView) getActivity().findViewById(
-				R.id.imageview);
-		mPhoto = imageView.getDrawable();
-	}
-
-	public void onPhotoTaken() {
-		ImageView imageView = (ImageView) getActivity().findViewById(
-				R.id.imageview);
-		imageView.setImageURI(mPhotoUri);
-	}
-
-	public interface PhotoObserver {
-		public void onTakePhoto(Uri photoUri);
 	}
 
 }
