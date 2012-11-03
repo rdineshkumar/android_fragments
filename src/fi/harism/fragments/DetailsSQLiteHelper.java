@@ -9,11 +9,7 @@ public class DetailsSQLiteHelper extends SQLiteOpenHelper {
 	public static final String COLUMN_ADDRESS = "address";
 	public static final String COLUMN_ID = "_id";
 	public static final String COLUMN_NAME = "name";
-	/*
-	 * private static final String DATABASE_CREATE = "create table " +
-	 * TABLE_DETAILS + "(" + COLUMN_ID + " integer primary key autoincrement, "
-	 * + COLUMN_NAME + " text not null, " + COLUMN_ADDRESS + " text not null);";
-	 */
+	public static final String COLUMN_PHOTO = "photo";
 	public static final String TABLE_DETAILS = "details";
 
 	public DetailsSQLiteHelper(Context context) {
@@ -27,7 +23,8 @@ public class DetailsSQLiteHelper extends SQLiteOpenHelper {
 		sb.append("create table ").append(TABLE_DETAILS).append(" (");
 		sb.append(COLUMN_ID).append(" integer primary key autoincrement, ");
 		sb.append(COLUMN_NAME).append(" text not null, ");
-		sb.append(COLUMN_ADDRESS).append(" text not null");
+		sb.append(COLUMN_ADDRESS).append(" text not null, ");
+		sb.append(COLUMN_PHOTO).append(" blob");
 		sb.append(");");
 
 		database.execSQL(sb.toString());

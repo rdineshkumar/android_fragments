@@ -13,6 +13,7 @@ import android.database.sqlite.SQLiteDatabase;
 public class DetailsDataSource {
 
 	private static DetailsDataSource mInstance;
+
 	public static DetailsDataSource getInstance(Context context) {
 		if (mInstance == null) {
 			mInstance = new DetailsDataSource(context);
@@ -20,11 +21,13 @@ public class DetailsDataSource {
 		}
 		return mInstance;
 	}
+
 	private String[] allColumns = { DetailsSQLiteHelper.COLUMN_ID,
-			DetailsSQLiteHelper.COLUMN_NAME, DetailsSQLiteHelper.COLUMN_ADDRESS };
+			DetailsSQLiteHelper.COLUMN_NAME,
+			DetailsSQLiteHelper.COLUMN_ADDRESS,
+			DetailsSQLiteHelper.COLUMN_PHOTO };
 	private SQLiteDatabase database;
 	private DetailsSQLiteHelper dbHelper;
-
 	private Vector<Observer> mObservers = new Vector<Observer>();
 
 	public DetailsDataSource(Context context) {
@@ -39,10 +42,10 @@ public class DetailsDataSource {
 		dbHelper.close();
 	}
 
-	public Details createDetails(String name, String address) {
+	public Details createDetails() {
 		ContentValues values = new ContentValues();
-		values.put(DetailsSQLiteHelper.COLUMN_NAME, name);
-		values.put(DetailsSQLiteHelper.COLUMN_ADDRESS, address);
+		values.put(DetailsSQLiteHelper.COLUMN_NAME, "");
+		values.put(DetailsSQLiteHelper.COLUMN_ADDRESS, "");
 		long insertId = database.insert(DetailsSQLiteHelper.TABLE_DETAILS,
 				null, values);
 
@@ -50,27 +53,17 @@ public class DetailsDataSource {
 
 		return getDetails(insertId);
 	}
-	
-	public Details getDetails(long id) {
-		Cursor cursor = database.query(DetailsSQLiteHelper.TABLE_DETAILS,
-				allColumns, DetailsSQLiteHelper.COLUMN_ID + " = " + id,
-				null, null, null, null);
-		cursor.moveToFirst();
-		Details details = cursorToDetails(cursor);
-		cursor.close();
-		return details;
-	}
 
 	private Details cursorToDetails(Cursor cursor) {
 		Details details = new Details();
 		details.setId(cursor.getLong(0));
 		details.setName(cursor.getString(1));
 		details.setAddress(cursor.getString(2));
+		details.setPhoto(cursor.getBlob(3));
 		return details;
 	}
 
-	public void deleteDetails(Details details) {
-		long id = details.getId();
+	public void deleteDetails(long id) {
 		database.delete(DetailsSQLiteHelper.TABLE_DETAILS,
 				DetailsSQLiteHelper.COLUMN_ID + " = " + id, null);
 		notifyObservers();
@@ -80,7 +73,8 @@ public class DetailsDataSource {
 		List<Details> detailsList = new ArrayList<Details>();
 
 		Cursor cursor = database.query(DetailsSQLiteHelper.TABLE_DETAILS,
-				allColumns, null, null, null, null, DetailsSQLiteHelper.COLUMN_NAME);
+				allColumns, null, null, null, null,
+				DetailsSQLiteHelper.COLUMN_NAME);
 
 		cursor.moveToFirst();
 		while (!cursor.isAfterLast()) {
@@ -91,6 +85,16 @@ public class DetailsDataSource {
 		cursor.close();
 
 		return detailsList;
+	}
+
+	public Details getDetails(long id) {
+		Cursor cursor = database.query(DetailsSQLiteHelper.TABLE_DETAILS,
+				allColumns, DetailsSQLiteHelper.COLUMN_ID + " = " + id, null,
+				null, null, null);
+		cursor.moveToFirst();
+		Details details = cursorToDetails(cursor);
+		cursor.close();
+		return details;
 	}
 
 	private void notifyObservers() {
@@ -105,6 +109,17 @@ public class DetailsDataSource {
 
 	public void removeObserver(Observer observer) {
 		mObservers.remove(observer);
+	}
+
+	public void updateDetails(Details details) {
+		ContentValues values = new ContentValues();
+		values.put(DetailsSQLiteHelper.COLUMN_ID, details.getId());
+		values.put(DetailsSQLiteHelper.COLUMN_NAME, details.getName());
+		values.put(DetailsSQLiteHelper.COLUMN_ADDRESS, details.getAddress());
+		values.put(DetailsSQLiteHelper.COLUMN_PHOTO, details.getPhoto());
+		database.replace(DetailsSQLiteHelper.TABLE_DETAILS, null, values);
+
+		notifyObservers();
 	}
 
 	public interface Observer {

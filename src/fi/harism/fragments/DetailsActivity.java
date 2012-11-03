@@ -18,8 +18,10 @@ public class DetailsActivity extends Activity {
 				WindowManager.LayoutParams.SOFT_INPUT_STATE_UNCHANGED);
 		setContentView(R.layout.activity_details);
 
-		getFragmentManager().findFragmentById(R.id.fragment_details)
-				.setArguments(getIntent().getExtras());
+		DetailsFragment details = new DetailsFragment();
+		details.setArguments(getIntent().getExtras());
+		getFragmentManager().beginTransaction()
+				.replace(R.id.details_container, details).commit();
 	}
 
 }

@@ -4,27 +4,32 @@ import java.util.List;
 
 import android.app.FragmentTransaction;
 import android.app.ListFragment;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 public class ItemsFragment extends ListFragment implements
 		DetailsDataSource.Observer {
 
 	private DetailsDataSource mDataSource;
-	private boolean mDualPane;
+
+	private boolean isDualPane() {
+		View details = getActivity().findViewById(R.id.details_container);
+		return details != null && details.getVisibility() == View.VISIBLE;
+	}
 
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		View details = getActivity().findViewById(R.id.details_container);
-		mDualPane = details != null && details.getVisibility() == View.VISIBLE;
-		if (mDualPane) {
-			getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+		if (isDualPane()) {
+			getListView().setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
 		}
 	}
 
@@ -52,8 +57,7 @@ public class ItemsFragment extends ListFragment implements
 	@Override
 	public void onDetailsChanged() {
 		List<Details> values = mDataSource.getAllDetails();
-		ArrayAdapter<Details> adapter = new ArrayAdapter<Details>(
-				getActivity(), android.R.layout.simple_list_item_1, values);
+		DetailsAdapter adapter = new DetailsAdapter(getActivity(), values);
 		setListAdapter(adapter);
 	}
 
@@ -61,24 +65,47 @@ public class ItemsFragment extends ListFragment implements
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		Details details = (Details) getListAdapter().getItem(position);
 
-		if (mDualPane) {
+		if (isDualPane()) {
 			getListView().setItemChecked(position, true);
-			
+
 			Bundle bundle = new Bundle();
 			bundle.putLong("detailsId", details.getId());
 			DetailsFragment detailsFragment = new DetailsFragment();
-			detailsFragment.setArguments(bundle);			
-			
+			detailsFragment.setArguments(bundle);
+
 			FragmentTransaction ft = getFragmentManager().beginTransaction();
 			ft.replace(R.id.details_container, detailsFragment);
 			ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
 			ft.commit();
 		} else {
-            Intent intent = new Intent();
-            intent.setClass(getActivity(), DetailsActivity.class);
-            intent.putExtra("detailsId", details.getId());
-            startActivity(intent);			
+			Intent intent = new Intent();
+			intent.setClass(getActivity(), DetailsActivity.class);
+			intent.putExtra("detailsId", details.getId());
+			startActivity(intent);
 		}
+	}
+
+	private class DetailsAdapter extends ArrayAdapter<Details> {
+
+		public DetailsAdapter(Context context, List<Details> objects) {
+			super(context, R.layout.fragment_list_item, objects);
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			Details details = getItem(position);
+
+			View view = getActivity().getLayoutInflater().inflate(
+					R.layout.fragment_list_item, null, false);
+
+			((TextView) view.findViewById(R.id.textview_name)).setText(details
+					.getName());
+			((TextView) view.findViewById(R.id.textview_address))
+					.setText(details.getAddress());
+
+			return view;
+		}
+
 	}
 
 }

@@ -15,7 +15,13 @@
     </style>
 
     <style name="textview">
+        <item name="android:textColor">#EEE</item>
         <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="textview_small">
+        <item name="android:textColor">#EEE</item>
+        <item name="android:textSize">14sp</item>
     </style>
 
     <style name="edittext">

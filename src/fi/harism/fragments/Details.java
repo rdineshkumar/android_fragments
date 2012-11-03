@@ -5,6 +5,7 @@ public class Details {
 	private String mAddress;
 	private long mId;
 	private String mName;
+	private byte[] mPhoto;
 
 	public String getAddress() {
 		return mAddress;
@@ -16,6 +17,10 @@ public class Details {
 
 	public String getName() {
 		return mName;
+	}
+
+	public byte[] getPhoto() {
+		return mPhoto;
 	}
 
 	public void setAddress(String address) {
@@ -30,9 +35,8 @@ public class Details {
 		mName = name;
 	}
 
-	@Override
-	public String toString() {
-		return mName + "\n" + mAddress;
+	public void setPhoto(byte[] photo) {
+		mPhoto = photo;
 	}
 
 }
