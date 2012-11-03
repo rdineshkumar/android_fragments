@@ -1,21 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="4dp" >
+    style="@style/include_container" >
 
     <Button
         android:id="@+id/button"
-        style="@style/fragment_title"
+        style="@style/include_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Take Photo" />
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@drawable/bg_separator" />
+    <include layout="@layout/include_separator_horizontal" />
 
     <ImageView
         android:id="@+id/imageview"

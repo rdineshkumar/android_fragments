@@ -12,14 +12,32 @@ import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.Spinner;
 
-public class FragmentPhoto extends Fragment implements View.OnClickListener {
+public class DetailsFragment extends Fragment implements View.OnClickListener {
 
 	private static final int ACTION_CODE = 100;
 
 	private boolean mPhotoTaken;
 	private Uri mPhotoUri;
+
+	private void initSpinners(View view) {
+		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+				getActivity(), R.array.planets_array,
+				android.R.layout.simple_spinner_item);
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+		Spinner spinner1 = (Spinner) view.findViewById(R.id.spinner1);
+		spinner1.setAdapter(adapter);
+
+		Spinner spinner2 = (Spinner) view.findViewById(R.id.spinner2);
+		spinner2.setAdapter(adapter);
+
+		Spinner spinner3 = (Spinner) view.findViewById(R.id.spinner3);
+		spinner3.setAdapter(adapter);
+	}
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -52,10 +70,13 @@ public class FragmentPhoto extends Fragment implements View.OnClickListener {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.fragment_photo, container, false);
+		View view = inflater.inflate(R.layout.fragment_details, container,
+				false);
+
+		initSpinners(view.findViewById(R.id.spinners1));
+		initSpinners(view.findViewById(R.id.spinners2));
 
 		view.findViewById(R.id.button).setOnClickListener(this);
-
 		if (mPhotoTaken) {
 			ImageView imageView = (ImageView) view.findViewById(R.id.imageview);
 			imageView.setImageURI(mPhotoUri);

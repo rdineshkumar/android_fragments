@@ -1,9 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="fragment_title">
+    <style name="include_container">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:padding">4dp</item>
+    </style>
+
+    <style name="include_title">
         <item name="android:textColor">#EEE</item>
         <item name="android:textSize">24sp</item>
+    </style>
+
+    <style name="include_textview">
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="include_edittext">
+        <item name="android:textSize">18sp</item>
     </style>
 
 </resources>
