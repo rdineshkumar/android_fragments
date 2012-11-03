@@ -75,6 +75,12 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 					R.id.edittext_name)).getText().toString());
 			mDetails.setAddress(((EditText) getView().findViewById(
 					R.id.edittext_address)).getText().toString());
+			mDetails.setPlanet1(((Spinner) getView()
+					.findViewById(R.id.spinner1)).getSelectedItemPosition());
+			mDetails.setPlanet2(((Spinner) getView()
+					.findViewById(R.id.spinner2)).getSelectedItemPosition());
+			mDetails.setPlanet3(((Spinner) getView()
+					.findViewById(R.id.spinner3)).getSelectedItemPosition());
 			DetailsDataSource.getInstance(getActivity())
 					.updateDetails(mDetails);
 			break;
@@ -117,12 +123,15 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 
 		Spinner spinner1 = (Spinner) view.findViewById(R.id.spinner1);
 		spinner1.setAdapter(adapter);
+		spinner1.setSelection(mDetails.getPlanet1());
 
 		Spinner spinner2 = (Spinner) view.findViewById(R.id.spinner2);
 		spinner2.setAdapter(adapter);
+		spinner2.setSelection(mDetails.getPlanet2());
 
 		Spinner spinner3 = (Spinner) view.findViewById(R.id.spinner3);
 		spinner3.setAdapter(adapter);
+		spinner3.setSelection(mDetails.getPlanet3());
 
 		((TextView) view.findViewById(R.id.edittext_name)).setText(mDetails
 				.getName());

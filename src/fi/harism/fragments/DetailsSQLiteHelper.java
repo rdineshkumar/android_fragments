@@ -10,6 +10,9 @@ public class DetailsSQLiteHelper extends SQLiteOpenHelper {
 	public static final String COLUMN_ID = "_id";
 	public static final String COLUMN_NAME = "name";
 	public static final String COLUMN_PHOTO = "photo";
+	public static final String COLUMN_PLANET1 = "planet1";
+	public static final String COLUMN_PLANET2 = "planet2";
+	public static final String COLUMN_PLANET3 = "planet3";
 	public static final String TABLE_DETAILS = "details";
 
 	public DetailsSQLiteHelper(Context context) {
@@ -24,6 +27,9 @@ public class DetailsSQLiteHelper extends SQLiteOpenHelper {
 		sb.append(COLUMN_ID).append(" integer primary key autoincrement, ");
 		sb.append(COLUMN_NAME).append(" text not null, ");
 		sb.append(COLUMN_ADDRESS).append(" text not null, ");
+		sb.append(COLUMN_PLANET1).append(" integer, ");
+		sb.append(COLUMN_PLANET2).append(" integer, ");
+		sb.append(COLUMN_PLANET3).append(" integer, ");
 		sb.append(COLUMN_PHOTO).append(" blob");
 		sb.append(");");
 

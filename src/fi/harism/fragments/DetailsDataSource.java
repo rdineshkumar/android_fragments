@@ -25,6 +25,9 @@ public class DetailsDataSource {
 	private String[] allColumns = { DetailsSQLiteHelper.COLUMN_ID,
 			DetailsSQLiteHelper.COLUMN_NAME,
 			DetailsSQLiteHelper.COLUMN_ADDRESS,
+			DetailsSQLiteHelper.COLUMN_PLANET1,
+			DetailsSQLiteHelper.COLUMN_PLANET2,
+			DetailsSQLiteHelper.COLUMN_PLANET3,
 			DetailsSQLiteHelper.COLUMN_PHOTO };
 	private SQLiteDatabase database;
 	private DetailsSQLiteHelper dbHelper;
@@ -59,7 +62,10 @@ public class DetailsDataSource {
 		details.setId(cursor.getLong(0));
 		details.setName(cursor.getString(1));
 		details.setAddress(cursor.getString(2));
-		details.setPhoto(cursor.getBlob(3));
+		details.setPlanet1(cursor.getInt(3));
+		details.setPlanet2(cursor.getInt(4));
+		details.setPlanet3(cursor.getInt(5));
+		details.setPhoto(cursor.getBlob(6));
 		return details;
 	}
 
@@ -116,6 +122,9 @@ public class DetailsDataSource {
 		values.put(DetailsSQLiteHelper.COLUMN_ID, details.getId());
 		values.put(DetailsSQLiteHelper.COLUMN_NAME, details.getName());
 		values.put(DetailsSQLiteHelper.COLUMN_ADDRESS, details.getAddress());
+		values.put(DetailsSQLiteHelper.COLUMN_PLANET1, details.getPlanet1());
+		values.put(DetailsSQLiteHelper.COLUMN_PLANET2, details.getPlanet2());
+		values.put(DetailsSQLiteHelper.COLUMN_PLANET3, details.getPlanet3());
 		values.put(DetailsSQLiteHelper.COLUMN_PHOTO, details.getPhoto());
 		database.replace(DetailsSQLiteHelper.TABLE_DETAILS, null, values);
 

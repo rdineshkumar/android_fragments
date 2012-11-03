@@ -10,6 +10,9 @@ public class Details implements Serializable {
 	private long mId;
 	private String mName;
 	private byte[] mPhoto;
+	private int mPlanet1;
+	private int mPlanet2;
+	private int mPlanet3;
 
 	public String getAddress() {
 		return mAddress;
@@ -27,6 +30,18 @@ public class Details implements Serializable {
 		return mPhoto;
 	}
 
+	public int getPlanet1() {
+		return mPlanet1;
+	}
+
+	public int getPlanet2() {
+		return mPlanet2;
+	}
+
+	public int getPlanet3() {
+		return mPlanet3;
+	}
+
 	public void setAddress(String address) {
 		mAddress = address;
 	}
@@ -41,6 +56,18 @@ public class Details implements Serializable {
 
 	public void setPhoto(byte[] photo) {
 		mPhoto = photo;
+	}
+
+	public void setPlanet1(int index) {
+		mPlanet1 = index;
+	}
+
+	public void setPlanet2(int index) {
+		mPlanet2 = index;
+	}
+
+	public void setPlanet3(int index) {
+		mPlanet3 = index;
 	}
 
 }
