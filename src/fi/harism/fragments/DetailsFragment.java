@@ -23,22 +23,6 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 	private boolean mPhotoTaken;
 	private Uri mPhotoUri;
 
-	private void initSpinners(View view) {
-		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-				getActivity(), R.array.planets_array,
-				android.R.layout.simple_spinner_item);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-		Spinner spinner1 = (Spinner) view.findViewById(R.id.spinner1);
-		spinner1.setAdapter(adapter);
-
-		Spinner spinner2 = (Spinner) view.findViewById(R.id.spinner2);
-		spinner2.setAdapter(adapter);
-
-		Spinner spinner3 = (Spinner) view.findViewById(R.id.spinner3);
-		spinner3.setAdapter(adapter);
-	}
-
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == ACTION_CODE && resultCode == Activity.RESULT_OK) {
@@ -73,8 +57,19 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 		View view = inflater.inflate(R.layout.fragment_details, container,
 				false);
 
-		initSpinners(view.findViewById(R.id.spinners1));
-		initSpinners(view.findViewById(R.id.spinners2));
+		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+				getActivity(), R.array.planets_array,
+				android.R.layout.simple_spinner_item);
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+		Spinner spinner1 = (Spinner) view.findViewById(R.id.spinner1);
+		spinner1.setAdapter(adapter);
+
+		Spinner spinner2 = (Spinner) view.findViewById(R.id.spinner2);
+		spinner2.setAdapter(adapter);
+
+		Spinner spinner3 = (Spinner) view.findViewById(R.id.spinner3);
+		spinner3.setAdapter(adapter);
 
 		view.findViewById(R.id.button).setOnClickListener(this);
 		if (mPhotoTaken) {

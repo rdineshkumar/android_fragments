@@ -45,16 +45,20 @@ public class DetailsDataSource {
 		values.put(DetailsSQLiteHelper.COLUMN_ADDRESS, address);
 		long insertId = database.insert(DetailsSQLiteHelper.TABLE_DETAILS,
 				null, values);
-		Cursor cursor = database.query(DetailsSQLiteHelper.TABLE_DETAILS,
-				allColumns, DetailsSQLiteHelper.COLUMN_ID + " = " + insertId,
-				null, null, null, null);
-		cursor.moveToFirst();
-		Details newDetails = cursorToDetails(cursor);
-		cursor.close();
 
 		notifyObservers();
 
-		return newDetails;
+		return getDetails(insertId);
+	}
+	
+	public Details getDetails(long id) {
+		Cursor cursor = database.query(DetailsSQLiteHelper.TABLE_DETAILS,
+				allColumns, DetailsSQLiteHelper.COLUMN_ID + " = " + id,
+				null, null, null, null);
+		cursor.moveToFirst();
+		Details details = cursorToDetails(cursor);
+		cursor.close();
+		return details;
 	}
 
 	private Details cursorToDetails(Cursor cursor) {
@@ -76,7 +80,7 @@ public class DetailsDataSource {
 		List<Details> detailsList = new ArrayList<Details>();
 
 		Cursor cursor = database.query(DetailsSQLiteHelper.TABLE_DETAILS,
-				allColumns, null, null, null, null, null);
+				allColumns, null, null, null, null, DetailsSQLiteHelper.COLUMN_NAME);
 
 		cursor.moveToFirst();
 		while (!cursor.isAfterLast()) {

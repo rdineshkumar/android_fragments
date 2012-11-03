@@ -32,6 +32,8 @@ public class AddDialogFragment extends DialogFragment {
 
 						DetailsDataSource.getInstance(getActivity())
 								.createDetails(name, address);
+						
+						AddDialogFragment.this.dismiss();
 					}
 				});
 

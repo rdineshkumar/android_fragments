@@ -2,8 +2,9 @@ package fi.harism.fragments;
 
 import java.util.List;
 
-import android.app.Activity;
+import android.app.FragmentTransaction;
 import android.app.ListFragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,12 +16,16 @@ public class ItemsFragment extends ListFragment implements
 		DetailsDataSource.Observer {
 
 	private DetailsDataSource mDataSource;
-	private Observer mObserver;
+	private boolean mDualPane;
 
 	@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-		mObserver = (Observer) activity;
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		View details = getActivity().findViewById(R.id.details_container);
+		mDualPane = details != null && details.getVisibility() == View.VISIBLE;
+		if (mDualPane) {
+			getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+		}
 	}
 
 	@Override
@@ -40,6 +45,7 @@ public class ItemsFragment extends ListFragment implements
 
 	@Override
 	public void onDestroy() {
+		super.onDestroy();
 		mDataSource.removeObserver(this);
 	}
 
@@ -54,10 +60,25 @@ public class ItemsFragment extends ListFragment implements
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		Details details = (Details) getListAdapter().getItem(position);
-		mObserver.onItemSelected(details.getId());
+
+		if (mDualPane) {
+			getListView().setItemChecked(position, true);
+			
+			Bundle bundle = new Bundle();
+			bundle.putLong("detailsId", details.getId());
+			DetailsFragment detailsFragment = new DetailsFragment();
+			detailsFragment.setArguments(bundle);			
+			
+			FragmentTransaction ft = getFragmentManager().beginTransaction();
+			ft.replace(R.id.details_container, detailsFragment);
+			ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+			ft.commit();
+		} else {
+            Intent intent = new Intent();
+            intent.setClass(getActivity(), DetailsActivity.class);
+            intent.putExtra("detailsId", details.getId());
+            startActivity(intent);			
+		}
 	}
 
-	public interface Observer {
-		public void onItemSelected(long detailsId);
-	}
 }

@@ -18,15 +18,10 @@
         android:background="@drawable/bg_separator" />
 
     <ScrollView
+        android:id="@+id/details_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1" >
-
-        <fragment
-            android:id="@+id/fragment_details"
-            android:name="fi.harism.fragments.DetailsFragment"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
     </ScrollView>
 
 </LinearLayout>

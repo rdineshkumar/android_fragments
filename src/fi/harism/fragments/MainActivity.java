@@ -8,9 +8,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
 
-public class MainActivity extends Activity implements ItemsFragment.Observer {
-
-	private boolean mTwoPane;
+public class MainActivity extends Activity {
 
 	public void addDetails(String name, String address) {
 
@@ -26,20 +24,12 @@ public class MainActivity extends Activity implements ItemsFragment.Observer {
 		getWindow().setSoftInputMode(
 				WindowManager.LayoutParams.SOFT_INPUT_STATE_UNCHANGED);
 		setContentView(R.layout.activity_main);
-
-		Fragment fragment = getFragmentManager().findFragmentById(
-				R.id.fragment_details);
-		mTwoPane = fragment != null && fragment.isVisible();
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.menu_main, menu);
 		return true;
-	}
-
-	@Override
-	public void onItemSelected(long detailsId) {
 	}
 
 	@Override
