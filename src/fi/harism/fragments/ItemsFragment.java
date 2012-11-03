@@ -68,10 +68,10 @@ public class ItemsFragment extends ListFragment implements
 		if (isDualPane()) {
 			getListView().setItemChecked(position, true);
 
-			Bundle bundle = new Bundle();
-			bundle.putLong("detailsId", details.getId());
+			Bundle args = new Bundle();
+			args.putSerializable("details", details);
 			DetailsFragment detailsFragment = new DetailsFragment();
-			detailsFragment.setArguments(bundle);
+			detailsFragment.setArguments(args);
 
 			FragmentTransaction ft = getFragmentManager().beginTransaction();
 			ft.replace(R.id.details_container, detailsFragment);

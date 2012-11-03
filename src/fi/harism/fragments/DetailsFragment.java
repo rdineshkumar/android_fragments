@@ -15,6 +15,7 @@ import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -26,29 +27,18 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 
 	private static final int ACTION_CODE = 100;
 
-	private DetailsDataSource mDataSource;
-	private byte[] mPhotoData;
+	private Details mDetails;
 	private File mPhotoFile = new File(
-			Environment.getExternalStorageDirectory(), "fragment.jpg");;
+			Environment.getExternalStorageDirectory(), "fragment.jpg");
 
 	private boolean isDualPane() {
 		return getFragmentManager().findFragmentById(R.id.fragment_items) != null;
 	}
 
 	@Override
-	public void onActivityCreated(Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
-
-		Details details = mDataSource.getDetails(getArguments().getLong(
-				"detailsId", -1));
-		mPhotoData = details.getPhoto();
-		updatePhoto();
-	}
-
-	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == ACTION_CODE && resultCode == Activity.RESULT_OK) {
-			mPhotoData = null;
+			mDetails.setPhoto(null);
 
 			try {
 				int read;
@@ -59,11 +49,13 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 					bos.write(buffer, 0, read);
 				}
 				fis.close();
-				mPhotoData = bos.toByteArray();
+				mDetails.setPhoto(bos.toByteArray());
 			} catch (Exception ex) {
 				Toast.makeText(getActivity(), "Unable to read photo.",
 						Toast.LENGTH_LONG).show();
 			}
+
+			getArguments().putSerializable("details", mDetails);
 
 			updatePhoto();
 		}
@@ -72,29 +64,31 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 	@Override
 	public void onClick(View view) {
 		switch (view.getId()) {
-		case R.id.button_take_photo:
+		case R.id.button_take_photo: {
 			Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 			intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mPhotoFile));
 			startActivityForResult(intent, ACTION_CODE);
 			break;
-		case R.id.button_save:
-			Details details = new Details();
-			details.setId(getArguments().getLong("detailsId", -1));
-			details.setName(((EditText) getView().findViewById(
+		}
+		case R.id.button_save: {
+			mDetails.setName(((EditText) getView().findViewById(
 					R.id.edittext_name)).getText().toString());
-			details.setAddress(((EditText) getView().findViewById(
+			mDetails.setAddress(((EditText) getView().findViewById(
 					R.id.edittext_address)).getText().toString());
-			details.setPhoto(mPhotoData);
-			mDataSource.updateDetails(details);
+			DetailsDataSource.getInstance(getActivity())
+					.updateDetails(mDetails);
 			break;
-		case R.id.button_delete:
-			mDataSource.deleteDetails(getArguments().getLong("detailsId", -1));
+		}
+		case R.id.button_delete: {
+			DetailsDataSource.getInstance(getActivity()).deleteDetails(
+					mDetails.getId());
 			if (isDualPane()) {
 				getFragmentManager().beginTransaction().remove(this).commit();
 			} else {
 				getActivity().finish();
 			}
 			break;
+		}
 		}
 	}
 
@@ -103,10 +97,7 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 		super.onActivityCreated(savedInstanceState);
 		setRetainInstance(true);
 
-		mDataSource = DetailsDataSource.getInstance(getActivity());
-
-		mPhotoFile = new File(Environment.getExternalStorageDirectory(),
-				"fragment.jpg");
+		mDetails = (Details) getArguments().getSerializable("details");
 	}
 
 	@Override
@@ -133,32 +124,42 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 		Spinner spinner3 = (Spinner) view.findViewById(R.id.spinner3);
 		spinner3.setAdapter(adapter);
 
-		Details details = mDataSource.getDetails(getArguments().getLong(
-				"detailsId", -1));
-		((TextView) view.findViewById(R.id.edittext_name)).setText(details
+		((TextView) view.findViewById(R.id.edittext_name)).setText(mDetails
 				.getName());
-		((TextView) view.findViewById(R.id.edittext_address)).setText(details
+		((TextView) view.findViewById(R.id.edittext_address)).setText(mDetails
 				.getAddress());
+
+		view.getViewTreeObserver().addOnGlobalLayoutListener(
+				new ViewTreeObserver.OnGlobalLayoutListener() {
+					@Override
+					public void onGlobalLayout() {
+						getView().getViewTreeObserver()
+								.removeGlobalOnLayoutListener(this);
+						updatePhoto();
+					}
+				});
 
 		return view;
 	}
 
 	private void updatePhoto() {
-		if (mPhotoData != null) {
-			ImageView imageView = (ImageView) getView().findViewById(
-					R.id.imageview);
-			imageView.setImageBitmap(null);
+		ImageView imageView = (ImageView) getView()
+				.findViewById(R.id.imageview);
+		imageView.setImageBitmap(null);
+		int viewWidth = getView().getWidth();
+		byte[] imageData = mDetails.getPhoto();
 
+		if (imageData != null && viewWidth != 0) {
 			BitmapFactory.Options bounds = new BitmapFactory.Options();
 			bounds.inJustDecodeBounds = true;
-			BitmapFactory.decodeByteArray(mPhotoData, 0, mPhotoData.length,
+			BitmapFactory.decodeByteArray(imageData, 0, imageData.length,
 					bounds);
 
 			BitmapFactory.Options options = new BitmapFactory.Options();
-			options.inSampleSize = getView().getWidth() / bounds.outWidth;
+			options.inSampleSize = bounds.outWidth / viewWidth;
 
-			imageView.setImageBitmap(BitmapFactory.decodeByteArray(mPhotoData,
-					0, mPhotoData.length, options));
+			imageView.setImageBitmap(BitmapFactory.decodeByteArray(imageData,
+					0, imageData.length, options));
 		}
 	}
 

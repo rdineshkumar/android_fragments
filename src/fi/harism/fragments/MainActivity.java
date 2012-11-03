@@ -43,10 +43,11 @@ public class MainActivity extends Activity {
 					.createDetails();
 
 			if (isDualPane()) {
-				Bundle bundle = new Bundle();
-				bundle.putLong("detailsId", details.getId());
+				Bundle args = new Bundle();
+				args.putSerializable("details", details);
+
 				DetailsFragment detailsFragment = new DetailsFragment();
-				detailsFragment.setArguments(bundle);
+				detailsFragment.setArguments(args);
 
 				FragmentTransaction ft = getFragmentManager()
 						.beginTransaction();
@@ -58,7 +59,6 @@ public class MainActivity extends Activity {
 				intent.setClass(this, DetailsActivity.class);
 				intent.putExtra("detailsId", details.getId());
 				startActivity(intent);
-
 			}
 			return true;
 		}

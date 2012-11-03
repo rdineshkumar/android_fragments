@@ -18,10 +18,24 @@ public class DetailsActivity extends Activity {
 				WindowManager.LayoutParams.SOFT_INPUT_STATE_UNCHANGED);
 		setContentView(R.layout.activity_details);
 
-		DetailsFragment details = new DetailsFragment();
-		details.setArguments(getIntent().getExtras());
+		Bundle args;
+		if (getIntent().getSerializableExtra("details") != null) {
+			args = getIntent().getExtras();
+		} else {
+			Details details = DetailsDataSource.getInstance(this).getDetails(
+					getIntent().getLongExtra("detailsId", -1));
+
+			args = new Bundle();
+			args.putSerializable("details", details);
+
+			getIntent().putExtras(args);
+		}
+
+		DetailsFragment detailsFragment = new DetailsFragment();
+		detailsFragment.setArguments(args);
+
 		getFragmentManager().beginTransaction()
-				.replace(R.id.details_container, details).commit();
+				.replace(R.id.details_container, detailsFragment).commit();
 	}
 
 }

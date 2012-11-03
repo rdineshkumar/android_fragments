@@ -1,6 +1,10 @@
 package fi.harism.fragments;
 
-public class Details {
+import java.io.Serializable;
+
+public class Details implements Serializable {
+
+	private static final long serialVersionUID = -8553876433947723956L;
 
 	private String mAddress;
 	private long mId;
