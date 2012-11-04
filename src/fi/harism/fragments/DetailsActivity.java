@@ -7,8 +7,6 @@ import android.view.WindowManager;
 
 public class DetailsActivity extends Activity {
 
-	private DetailsFragment mDetailsFragment;
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -18,21 +16,21 @@ public class DetailsActivity extends Activity {
 
 		getWindow().setSoftInputMode(
 				WindowManager.LayoutParams.SOFT_INPUT_STATE_UNCHANGED);
+		setContentView(R.layout.activity_details);
 
-		mDetailsFragment = new DetailsFragment();
-		if (savedInstanceState != null) {
-			mDetailsFragment.setArguments(savedInstanceState);
-		} else {
-			mDetailsFragment.setArguments(getIntent().getExtras());
+		if (savedInstanceState == null
+				|| !savedInstanceState.getBoolean(Constants.ARG_KEEP)) {
+			DetailsFragment detailsFragment = (DetailsFragment) getFragmentManager()
+					.findFragmentById(R.id.fragment_details);
+			detailsFragment.setDetailsId(getIntent().getLongExtra(
+					Constants.ARG_ID, -1));
 		}
-
-		getFragmentManager().beginTransaction()
-				.replace(android.R.id.content, mDetailsFragment).commit();
 	}
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		outState.putAll(mDetailsFragment.getArguments());
+		super.onSaveInstanceState(outState);
+		outState.putBoolean(Constants.ARG_KEEP, true);
 	}
 
 }

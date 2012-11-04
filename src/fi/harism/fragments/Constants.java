@@ -6,14 +6,8 @@ import android.os.Environment;
 
 public class Constants {
 
-	public static final String ARG_ADDRESS = "arg_address";
-	public static final String ARG_COMMENTS = "arg_comments";
-	public static final String ARG_COND_KITCHEN = "arg_kitchen";
-	public static final String ARG_COND_OVERALL = "arg_overall";
-	public static final String ARG_COND_TOILET = "arg_toilet";
 	public static final String ARG_ID = "arg_id";
 	public static final String ARG_KEEP = "arg_keep";
-	public static final String ARG_NAME = "arg_name";
 	public static final String ARG_PHOTO = "arg_photo";
 
 	public static final String DB_COLUMN_ADDRESS = "address";

@@ -36,12 +36,7 @@ public class ItemsFragment extends ListFragment implements
 	@Override
 	public void onClick(View v) {
 		if (isDualPane()) {
-			Bundle args = new Bundle();
-			args.putLong(Constants.ARG_ID, -1);
-
 			DetailsFragment detailsFragment = new DetailsFragment();
-			detailsFragment.setArguments(args);
-
 			FragmentTransaction ft = getFragmentManager().beginTransaction();
 			ft.replace(R.id.details_container, detailsFragment);
 			ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
@@ -92,15 +87,12 @@ public class ItemsFragment extends ListFragment implements
 		if (isDualPane()) {
 			getListView().setItemChecked(position, true);
 
-			Bundle args = new Bundle();
-			args.putLong(Constants.ARG_ID, details.getId());
 			DetailsFragment detailsFragment = new DetailsFragment();
-			detailsFragment.setArguments(args);
-
 			FragmentTransaction ft = getFragmentManager().beginTransaction();
 			ft.replace(R.id.details_container, detailsFragment);
 			ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
 			ft.commit();
+			detailsFragment.setDetailsId(details.getId());
 		} else {
 			Intent intent = new Intent();
 			intent.setClass(getActivity(), DetailsActivity.class);

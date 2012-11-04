@@ -24,6 +24,8 @@ import android.widget.Toast;
 public class DetailsFragment extends Fragment implements View.OnClickListener {
 
 	private static final int ACTION_CODE = 100;
+	private long mDetailsId = -1;
+	private byte[] mPhotoData;
 
 	private String getEditText(int id) {
 		return ((EditText) getView().findViewById(id)).getText().toString();
@@ -33,15 +35,16 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 		return ((Spinner) getView().findViewById(id)).getSelectedItemPosition();
 	}
 
-	private boolean isDualPane() {
-		return getFragmentManager().findFragmentById(R.id.fragment_items) != null;
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		setDetailsId(mDetailsId);
 	}
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == ACTION_CODE && resultCode == Activity.RESULT_OK) {
-			getArguments().putByteArray(Constants.ARG_PHOTO,
-					readFile(Constants.PHOTO_TEMP));
+			mPhotoData = readFile(Constants.PHOTO_TEMP);
 			Constants.PHOTO_TEMP.delete();
 			updatePhoto();
 		}
@@ -66,21 +69,20 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 			details.setCondToilet(getSpinner(R.id.spinner_toilet));
 			details.setComments(getEditText(R.id.edittext_comments));
 
-			long id = getArguments().getLong(Constants.ARG_ID, -1);
-			if (id == -1) {
-				id = DetailsDataSource.getInstance(getActivity())
+			if (mDetailsId == -1) {
+				mDetailsId = DetailsDataSource.getInstance(getActivity())
 						.insertDetails(details);
-				getArguments().putLong(Constants.ARG_ID, id);
 			} else {
-				details.setId(id);
+				details.setId(mDetailsId);
 				DetailsDataSource.getInstance(getActivity()).updateDetails(
 						details);
 			}
 
 			try {
 				FileOutputStream fos = new FileOutputStream(new File(
-						Constants.PHOTO_DIR, Constants.PHOTO_PREFIX + id));
-				fos.write(getArguments().getByteArray(Constants.ARG_PHOTO));
+						Constants.PHOTO_DIR, Constants.PHOTO_PREFIX
+								+ mDetailsId));
+				fos.write(mPhotoData);
 				fos.flush();
 				fos.close();
 			} catch (Exception ex) {
@@ -89,15 +91,9 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 			break;
 		}
 		case R.id.button_delete: {
-			long id = getArguments().getLong(Constants.ARG_ID);
-			DetailsDataSource.getInstance(getActivity()).deleteDetails(id);
-			new File(Constants.PHOTO_DIR, Constants.PHOTO_PREFIX + id).delete();
-
-			if (isDualPane()) {
-				getFragmentManager().beginTransaction().remove(this).commit();
-			} else {
-				getActivity().finish();
-			}
+			DeleteDialogFragment fragment = new DeleteDialogFragment();
+			fragment.setDetailsId(mDetailsId);
+			fragment.show(getFragmentManager(), "dialog");
 			break;
 		}
 		}
@@ -106,27 +102,11 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		// setRetainInstance(true);
+		setRetainInstance(true);
 
-		Bundle args = getArguments();
-		if (!args.getBoolean(Constants.ARG_KEEP)) {
-			Details details;
-			long id = getArguments().getLong(Constants.ARG_ID, -1);
-			if (id == -1) {
-				details = new Details();
-			} else {
-				details = DetailsDataSource.getInstance(getActivity())
-						.getDetails(id);
-				args.putByteArray(Constants.ARG_PHOTO, readFile(new File(
-						Constants.PHOTO_DIR, Constants.PHOTO_PREFIX + id)));
-			}
-
-			args.putString(Constants.ARG_NAME, details.getName());
-			args.putString(Constants.ARG_ADDRESS, details.getAddress());
-			args.putInt(Constants.ARG_COND_OVERALL, details.getCondOverall());
-			args.putInt(Constants.ARG_COND_KITCHEN, details.getCondKitchen());
-			args.putInt(Constants.ARG_COND_TOILET, details.getCondToilet());
-			args.putString(Constants.ARG_COMMENTS, details.getComments());
+		if (savedInstanceState != null) {
+			mDetailsId = savedInstanceState.getLong(Constants.ARG_ID);
+			mPhotoData = savedInstanceState.getByteArray(Constants.ARG_PHOTO);
 		}
 	}
 
@@ -139,20 +119,6 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 		view.findViewById(R.id.button_take_photo).setOnClickListener(this);
 		view.findViewById(R.id.button_save).setOnClickListener(this);
 		view.findViewById(R.id.button_delete).setOnClickListener(this);
-
-		Bundle args = getArguments();
-		setEditText(view, R.id.edittext_name,
-				args.getString(Constants.ARG_NAME));
-		setEditText(view, R.id.edittext_address,
-				args.getString(Constants.ARG_ADDRESS));
-		setSpinner(view, R.id.spinner_overall,
-				args.getInt(Constants.ARG_COND_OVERALL));
-		setSpinner(view, R.id.spinner_kitchen,
-				args.getInt(Constants.ARG_COND_KITCHEN));
-		setSpinner(view, R.id.spinner_toilet,
-				args.getInt(Constants.ARG_COND_TOILET));
-		setEditText(view, R.id.edittext_comments,
-				args.getString(Constants.ARG_COMMENTS));
 
 		view.getViewTreeObserver().addOnGlobalLayoutListener(
 				new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -170,23 +136,10 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 	}
 
 	@Override
-	public void onPause() {
-		super.onPause();
-
-		Bundle args = getArguments();
-		args.putString(Constants.ARG_NAME, getEditText(R.id.edittext_name));
-		args.putString(Constants.ARG_ADDRESS,
-				getEditText(R.id.edittext_address));
-		args.putInt(Constants.ARG_COND_OVERALL,
-				getSpinner(R.id.spinner_overall));
-		args.putInt(Constants.ARG_COND_KITCHEN,
-				getSpinner(R.id.spinner_kitchen));
-		args.putInt(Constants.ARG_COND_TOILET, getSpinner(R.id.spinner_toilet));
-		args.putString(Constants.ARG_COMMENTS,
-				getEditText(R.id.edittext_comments));
-		args.putByteArray(Constants.ARG_PHOTO,
-				getArguments().getByteArray(Constants.ARG_PHOTO));
-		args.putBoolean(Constants.ARG_KEEP, true);
+	public void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putByteArray(Constants.ARG_PHOTO, mPhotoData);
+		outState.putLong(Constants.ARG_ID, mDetailsId);
 	}
 
 	private byte[] readFile(File file) {
@@ -207,12 +160,37 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 		}
 	}
 
-	private void setEditText(View view, int id, CharSequence text) {
-		((EditText) view.findViewById(id)).setText(text);
+	public void setDetailsId(long id) {
+		mDetailsId = id;
+
+		if (getView() == null) {
+			return;
+		}
+
+		Details details;
+		if (id == -1) {
+			details = new Details();
+		} else {
+			details = DetailsDataSource.getInstance(getActivity()).getDetails(
+					id);
+			mPhotoData = readFile(new File(Constants.PHOTO_DIR,
+					Constants.PHOTO_PREFIX + id));
+		}
+
+		setEditText(R.id.edittext_name, details.getName());
+		setEditText(R.id.edittext_address, details.getAddress());
+		setSpinner(R.id.spinner_overall, details.getCondOverall());
+		setSpinner(R.id.spinner_kitchen, details.getCondKitchen());
+		setSpinner(R.id.spinner_toilet, details.getCondToilet());
+		setEditText(R.id.edittext_comments, details.getComments());
 	}
 
-	private void setSpinner(View view, int id, int pos) {
-		((Spinner) view.findViewById(id)).setSelection(pos);
+	private void setEditText(int id, CharSequence text) {
+		((EditText) getView().findViewById(id)).setText(text);
+	}
+
+	private void setSpinner(int id, int pos) {
+		((Spinner) getView().findViewById(id)).setSelection(pos);
 	}
 
 	private void updatePhoto() {
@@ -220,19 +198,18 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 				.findViewById(R.id.imageview);
 		imageView.setImageBitmap(null);
 		int viewWidth = getView().getWidth();
-		byte[] imageData = getArguments().getByteArray(Constants.ARG_PHOTO);
 
-		if (imageData != null && viewWidth != 0) {
+		if (mPhotoData != null && viewWidth != 0) {
 			BitmapFactory.Options bounds = new BitmapFactory.Options();
 			bounds.inJustDecodeBounds = true;
-			BitmapFactory.decodeByteArray(imageData, 0, imageData.length,
+			BitmapFactory.decodeByteArray(mPhotoData, 0, mPhotoData.length,
 					bounds);
 
 			BitmapFactory.Options options = new BitmapFactory.Options();
 			options.inSampleSize = bounds.outWidth / viewWidth;
 
-			imageView.setImageBitmap(BitmapFactory.decodeByteArray(imageData,
-					0, imageData.length, options));
+			imageView.setImageBitmap(BitmapFactory.decodeByteArray(mPhotoData,
+					0, mPhotoData.length, options));
 		}
 	}
 
