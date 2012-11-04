@@ -6,12 +6,11 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
 public class DeleteDialogFragment extends DialogFragment {
-
-	private long mDetailsId = -1;
 
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -22,18 +21,22 @@ public class DeleteDialogFragment extends DialogFragment {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				DetailsDataSource.getInstance(getActivity()).deleteDetails(
-						mDetailsId);
+						getArguments().getLong(Constants.ARG_ID));
 				new File(Constants.PHOTO_DIR, Constants.PHOTO_PREFIX
-						+ mDetailsId).delete();
+						+ getArguments().getLong(Constants.ARG_ID)).delete();
 
-				Fragment itemsFragment = getFragmentManager().findFragmentById(
-						R.id.fragment_items);
+				Fragment itemsFragment = getFragmentManager()
+						.findFragmentByTag("items");
 				Fragment detailsFragment = getFragmentManager()
-						.findFragmentById(R.id.fragment_details);
+						.findFragmentByTag("details");
 
 				if (itemsFragment != null) {
-					// TODO: Implement me
-					// getFragmentManager().beginTransaction().remove(detailsFragment).commit();
+					DeleteDialogFragment.this.dismiss();
+					FragmentTransaction ft = getFragmentManager()
+							.beginTransaction();
+					ft.setCustomAnimations(R.animator.in, R.animator.out);
+					ft.remove(detailsFragment);
+					ft.commit();
 				} else {
 					getActivity().finish();
 				}
@@ -41,10 +44,6 @@ public class DeleteDialogFragment extends DialogFragment {
 		});
 		builder.setNegativeButton("NO", null);
 		return builder.create();
-	}
-
-	public void setDetailsId(long id) {
-		mDetailsId = id;
 	}
 
 }

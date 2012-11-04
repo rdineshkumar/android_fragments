@@ -8,6 +8,12 @@ import android.view.WindowManager;
 public class DetailsActivity extends Activity {
 
 	@Override
+	public void finish() {
+		super.finish();
+		super.overridePendingTransition(R.anim.keep, R.anim.out);
+	}
+
+	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
@@ -21,7 +27,7 @@ public class DetailsActivity extends Activity {
 		if (savedInstanceState == null
 				|| !savedInstanceState.getBoolean(Constants.ARG_KEEP)) {
 			DetailsFragment detailsFragment = (DetailsFragment) getFragmentManager()
-					.findFragmentById(R.id.fragment_details);
+					.findFragmentByTag("details");
 			detailsFragment.setDetailsId(getIntent().getLongExtra(
 					Constants.ARG_ID, -1));
 		}

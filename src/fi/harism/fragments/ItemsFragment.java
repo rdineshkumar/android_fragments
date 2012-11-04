@@ -38,8 +38,8 @@ public class ItemsFragment extends ListFragment implements
 		if (isDualPane()) {
 			DetailsFragment detailsFragment = new DetailsFragment();
 			FragmentTransaction ft = getFragmentManager().beginTransaction();
-			ft.replace(R.id.details_container, detailsFragment);
-			ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+			ft.setCustomAnimations(R.animator.in, R.animator.out);
+			ft.replace(R.id.details_container, detailsFragment, "details");
 			ft.commit();
 		} else {
 			Intent intent = new Intent();
@@ -89,8 +89,8 @@ public class ItemsFragment extends ListFragment implements
 
 			DetailsFragment detailsFragment = new DetailsFragment();
 			FragmentTransaction ft = getFragmentManager().beginTransaction();
-			ft.replace(R.id.details_container, detailsFragment);
-			ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+			ft.setCustomAnimations(R.animator.in, R.animator.out);
+			ft.replace(R.id.details_container, detailsFragment, "details");
 			ft.commit();
 			detailsFragment.setDetailsId(details.getId());
 		} else {
@@ -98,6 +98,7 @@ public class ItemsFragment extends ListFragment implements
 			intent.setClass(getActivity(), DetailsActivity.class);
 			intent.putExtra(Constants.ARG_ID, details.getId());
 			startActivity(intent);
+			getActivity().overridePendingTransition(R.anim.in, R.anim.keep);
 		}
 	}
 

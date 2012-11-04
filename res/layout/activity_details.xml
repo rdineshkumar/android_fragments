@@ -4,9 +4,9 @@
     android:layout_height="match_parent" >
 
     <fragment
-        android:id="@+id/fragment_details"
         android:name="fi.harism.fragments.DetailsFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:tag="details" />
 
 </LinearLayout>

@@ -91,8 +91,10 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 			break;
 		}
 		case R.id.button_delete: {
+			Bundle args = new Bundle();
+			args.putLong(Constants.ARG_ID, mDetailsId);
 			DeleteDialogFragment fragment = new DeleteDialogFragment();
-			fragment.setDetailsId(mDetailsId);
+			fragment.setArguments(args);
 			fragment.show(getFragmentManager(), "dialog");
 			break;
 		}
