@@ -7,6 +7,8 @@ import android.view.WindowManager;
 
 public class DetailsActivity extends Activity {
 
+	private DetailsFragment mDetailsFragment;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -17,28 +19,20 @@ public class DetailsActivity extends Activity {
 		getWindow().setSoftInputMode(
 				WindowManager.LayoutParams.SOFT_INPUT_STATE_UNCHANGED);
 
-		Bundle args;
-		if (getIntent().getSerializableExtra("details") != null) {
-			args = getIntent().getExtras();
+		mDetailsFragment = new DetailsFragment();
+		if (savedInstanceState != null) {
+			mDetailsFragment.setArguments(savedInstanceState);
 		} else {
-			Details details = new Details();
-			long detailsId = getIntent().getLongExtra("detailsId", -1);
-			if (detailsId != -1) {
-				details = DetailsDataSource.getInstance(this).getDetails(
-						detailsId);
-			}
-
-			args = new Bundle();
-			args.putSerializable("details", details);
-
-			getIntent().putExtras(args);
+			mDetailsFragment.setArguments(getIntent().getExtras());
 		}
 
-		DetailsFragment detailsFragment = new DetailsFragment();
-		detailsFragment.setArguments(args);
-
 		getFragmentManager().beginTransaction()
-				.replace(android.R.id.content, detailsFragment).commit();
+				.replace(android.R.id.content, mDetailsFragment).commit();
+	}
+
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+		outState.putAll(mDetailsFragment.getArguments());
 	}
 
 }

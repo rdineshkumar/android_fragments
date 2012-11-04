@@ -3,6 +3,7 @@ package fi.harism.fragments;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -18,16 +19,19 @@ import android.view.ViewTreeObserver;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 public class DetailsFragment extends Fragment implements View.OnClickListener {
 
 	private static final int ACTION_CODE = 100;
-	private static final File TEMP_PHOTO_FILE = new File(Constants.PHOTO_DIR,
-			"temp");
 
-	private Details mDetails;
+	private String getEditText(int id) {
+		return ((EditText) getView().findViewById(id)).getText().toString();
+	}
+
+	private int getSpinner(int id) {
+		return ((Spinner) getView().findViewById(id)).getSelectedItemPosition();
+	}
 
 	private boolean isDualPane() {
 		return getFragmentManager().findFragmentById(R.id.fragment_items) != null;
@@ -36,25 +40,9 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == ACTION_CODE && resultCode == Activity.RESULT_OK) {
-			mDetails.setPhoto(null);
-
-			try {
-				int read;
-				byte[] buffer = new byte[8192];
-				FileInputStream fis = new FileInputStream(TEMP_PHOTO_FILE);
-				ByteArrayOutputStream bos = new ByteArrayOutputStream();
-				while ((read = fis.read(buffer)) != -1) {
-					bos.write(buffer, 0, read);
-				}
-				fis.close();
-				mDetails.setPhoto(bos.toByteArray());
-			} catch (Exception ex) {
-				Toast.makeText(getActivity(), "Unable to read photo.",
-						Toast.LENGTH_LONG).show();
-			}
-
-			storeDetails();
-
+			getArguments().putByteArray(Constants.ARG_PHOTO,
+					readFile(Constants.PHOTO_TEMP));
+			Constants.PHOTO_TEMP.delete();
 			updatePhoto();
 		}
 	}
@@ -65,19 +53,46 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 		case R.id.button_take_photo: {
 			Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 			intent.putExtra(MediaStore.EXTRA_OUTPUT,
-					Uri.fromFile(TEMP_PHOTO_FILE));
+					Uri.fromFile(Constants.PHOTO_TEMP));
 			startActivityForResult(intent, ACTION_CODE);
 			break;
 		}
 		case R.id.button_save: {
-			storeDetails();
-			DetailsDataSource.getInstance(getActivity())
-					.updateDetails(mDetails);
+			Details details = new Details();
+			details.setName(getEditText(R.id.edittext_name));
+			details.setAddress(getEditText(R.id.edittext_address));
+			details.setCondOverall(getSpinner(R.id.spinner_overall));
+			details.setCondKitchen(getSpinner(R.id.spinner_kitchen));
+			details.setCondToilet(getSpinner(R.id.spinner_toilet));
+			details.setComments(getEditText(R.id.edittext_comments));
+
+			long id = getArguments().getLong(Constants.ARG_ID, -1);
+			if (id == -1) {
+				id = DetailsDataSource.getInstance(getActivity())
+						.insertDetails(details);
+				getArguments().putLong(Constants.ARG_ID, id);
+			} else {
+				details.setId(id);
+				DetailsDataSource.getInstance(getActivity()).updateDetails(
+						details);
+			}
+
+			try {
+				FileOutputStream fos = new FileOutputStream(new File(
+						Constants.PHOTO_DIR, Constants.PHOTO_PREFIX + id));
+				fos.write(getArguments().getByteArray(Constants.ARG_PHOTO));
+				fos.flush();
+				fos.close();
+			} catch (Exception ex) {
+			}
+
 			break;
 		}
 		case R.id.button_delete: {
-			DetailsDataSource.getInstance(getActivity()).deleteDetails(
-					mDetails.getId());
+			long id = getArguments().getLong(Constants.ARG_ID);
+			DetailsDataSource.getInstance(getActivity()).deleteDetails(id);
+			new File(Constants.PHOTO_DIR, Constants.PHOTO_PREFIX + id).delete();
+
 			if (isDualPane()) {
 				getFragmentManager().beginTransaction().remove(this).commit();
 			} else {
@@ -90,10 +105,29 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		super.onActivityCreated(savedInstanceState);
-		setRetainInstance(true);
+		super.onCreate(savedInstanceState);
+		// setRetainInstance(true);
 
-		mDetails = (Details) getArguments().getSerializable("details");
+		Bundle args = getArguments();
+		if (!args.getBoolean(Constants.ARG_KEEP)) {
+			Details details;
+			long id = getArguments().getLong(Constants.ARG_ID, -1);
+			if (id == -1) {
+				details = new Details();
+			} else {
+				details = DetailsDataSource.getInstance(getActivity())
+						.getDetails(id);
+				args.putByteArray(Constants.ARG_PHOTO, readFile(new File(
+						Constants.PHOTO_DIR, Constants.PHOTO_PREFIX + id)));
+			}
+
+			args.putString(Constants.ARG_NAME, details.getName());
+			args.putString(Constants.ARG_ADDRESS, details.getAddress());
+			args.putInt(Constants.ARG_COND_OVERALL, details.getCondOverall());
+			args.putInt(Constants.ARG_COND_KITCHEN, details.getCondKitchen());
+			args.putInt(Constants.ARG_COND_TOILET, details.getCondToilet());
+			args.putString(Constants.ARG_COMMENTS, details.getComments());
+		}
 	}
 
 	@Override
@@ -106,18 +140,19 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 		view.findViewById(R.id.button_save).setOnClickListener(this);
 		view.findViewById(R.id.button_delete).setOnClickListener(this);
 
-		((TextView) view.findViewById(R.id.edittext_name)).setText(mDetails
-				.getName());
-		((TextView) view.findViewById(R.id.edittext_address)).setText(mDetails
-				.getAddress());
-		((Spinner) view.findViewById(R.id.spinner_overall))
-				.setSelection(mDetails.getConditionOverall());
-		((Spinner) view.findViewById(R.id.spinner_kitchen))
-				.setSelection(mDetails.getConditionKitchen());
-		((Spinner) view.findViewById(R.id.spinner_toilet))
-				.setSelection(mDetails.getConditionToilet());
-		((TextView) view.findViewById(R.id.edittext_comments)).setText(mDetails
-				.getComments());
+		Bundle args = getArguments();
+		setEditText(view, R.id.edittext_name,
+				args.getString(Constants.ARG_NAME));
+		setEditText(view, R.id.edittext_address,
+				args.getString(Constants.ARG_ADDRESS));
+		setSpinner(view, R.id.spinner_overall,
+				args.getInt(Constants.ARG_COND_OVERALL));
+		setSpinner(view, R.id.spinner_kitchen,
+				args.getInt(Constants.ARG_COND_KITCHEN));
+		setSpinner(view, R.id.spinner_toilet,
+				args.getInt(Constants.ARG_COND_TOILET));
+		setEditText(view, R.id.edittext_comments,
+				args.getString(Constants.ARG_COMMENTS));
 
 		view.getViewTreeObserver().addOnGlobalLayoutListener(
 				new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -137,23 +172,47 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 	@Override
 	public void onPause() {
 		super.onPause();
-		storeDetails();
+
+		Bundle args = getArguments();
+		args.putString(Constants.ARG_NAME, getEditText(R.id.edittext_name));
+		args.putString(Constants.ARG_ADDRESS,
+				getEditText(R.id.edittext_address));
+		args.putInt(Constants.ARG_COND_OVERALL,
+				getSpinner(R.id.spinner_overall));
+		args.putInt(Constants.ARG_COND_KITCHEN,
+				getSpinner(R.id.spinner_kitchen));
+		args.putInt(Constants.ARG_COND_TOILET, getSpinner(R.id.spinner_toilet));
+		args.putString(Constants.ARG_COMMENTS,
+				getEditText(R.id.edittext_comments));
+		args.putByteArray(Constants.ARG_PHOTO,
+				getArguments().getByteArray(Constants.ARG_PHOTO));
+		args.putBoolean(Constants.ARG_KEEP, true);
 	}
 
-	private void storeDetails() {
-		mDetails.setName(((EditText) getView().findViewById(R.id.edittext_name))
-				.getText().toString());
-		mDetails.setAddress(((EditText) getView().findViewById(
-				R.id.edittext_address)).getText().toString());
-		mDetails.setConditionOverall(((Spinner) getView().findViewById(
-				R.id.spinner_overall)).getSelectedItemPosition());
-		mDetails.setConditionKitchen(((Spinner) getView().findViewById(
-				R.id.spinner_kitchen)).getSelectedItemPosition());
-		mDetails.setConditionToilet(((Spinner) getView().findViewById(
-				R.id.spinner_toilet)).getSelectedItemPosition());
-		mDetails.setComments(((EditText) getView().findViewById(
-				R.id.edittext_comments)).getText().toString());
-		getArguments().putSerializable("details", mDetails);
+	private byte[] readFile(File file) {
+		try {
+			int read;
+			byte[] buffer = new byte[8192];
+			FileInputStream fis = new FileInputStream(file);
+			ByteArrayOutputStream bos = new ByteArrayOutputStream();
+			while ((read = fis.read(buffer)) != -1) {
+				bos.write(buffer, 0, read);
+			}
+			fis.close();
+			return bos.toByteArray();
+		} catch (Exception ex) {
+			Toast.makeText(getActivity(), "Unable to read photo.",
+					Toast.LENGTH_LONG).show();
+			return null;
+		}
+	}
+
+	private void setEditText(View view, int id, CharSequence text) {
+		((EditText) view.findViewById(id)).setText(text);
+	}
+
+	private void setSpinner(View view, int id, int pos) {
+		((Spinner) view.findViewById(id)).setSelection(pos);
 	}
 
 	private void updatePhoto() {
@@ -161,7 +220,7 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 				.findViewById(R.id.imageview);
 		imageView.setImageBitmap(null);
 		int viewWidth = getView().getWidth();
-		byte[] imageData = mDetails.getPhoto();
+		byte[] imageData = getArguments().getByteArray(Constants.ARG_PHOTO);
 
 		if (imageData != null && viewWidth != 0) {
 			BitmapFactory.Options bounds = new BitmapFactory.Options();

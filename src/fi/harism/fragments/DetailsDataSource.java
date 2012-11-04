@@ -24,10 +24,8 @@ public class DetailsDataSource {
 
 	private String[] allColumns = { Constants.DB_COLUMN_ID,
 			Constants.DB_COLUMN_NAME, Constants.DB_COLUMN_ADDRESS,
-			Constants.DB_COLUMN_CONDITION_OVERALL,
-			Constants.DB_COLUMN_CONDITION_KITCHEN,
-			Constants.DB_COLUMN_CONDITION_TOILET, Constants.DB_COLUMN_COMMENTS,
-			Constants.DB_COLUMN_PHOTO };
+			Constants.DB_COLUMN_COND_OVERALL, Constants.DB_COLUMN_COND_KITCHEN,
+			Constants.DB_COLUMN_COND_TOILET, Constants.DB_COLUMN_COMMENTS };
 	private SQLiteDatabase database;
 	private DetailsSQLiteHelper dbHelper;
 	private Vector<Observer> mObservers = new Vector<Observer>();
@@ -44,26 +42,15 @@ public class DetailsDataSource {
 		dbHelper.close();
 	}
 
-	/*
-	 * public Details createDetails() { ContentValues values = new
-	 * ContentValues(); //values.put(DetailsSQLiteHelper.COLUMN_NAME, "");
-	 * //values.put(DetailsSQLiteHelper.COLUMN_ADDRESS, ""); long insertId =
-	 * database.insert(DetailsSQLiteHelper.TABLE_DETAILS, null, values);
-	 * 
-	 * notifyObservers();
-	 * 
-	 * return getDetails(insertId); }
-	 */
 	private Details cursorToDetails(Cursor cursor) {
 		Details details = new Details();
 		details.setId(cursor.getLong(0));
 		details.setName(cursor.getString(1));
 		details.setAddress(cursor.getString(2));
-		details.setConditionOverall(cursor.getInt(3));
-		details.setConditionKitchen(cursor.getInt(4));
-		details.setConditionToilet(cursor.getInt(5));
+		details.setCondOverall(cursor.getInt(3));
+		details.setCondKitchen(cursor.getInt(4));
+		details.setCondToilet(cursor.getInt(5));
 		details.setComments(cursor.getString(6));
-		details.setPhoto(cursor.getBlob(7));
 		return details;
 	}
 
@@ -99,6 +86,21 @@ public class DetailsDataSource {
 		return details;
 	}
 
+	public long insertDetails(Details details) {
+		ContentValues values = new ContentValues();
+
+		values.put(Constants.DB_COLUMN_NAME, details.getName());
+		values.put(Constants.DB_COLUMN_ADDRESS, details.getAddress());
+		values.put(Constants.DB_COLUMN_COND_OVERALL, details.getCondOverall());
+		values.put(Constants.DB_COLUMN_COND_KITCHEN, details.getCondKitchen());
+		values.put(Constants.DB_COLUMN_COND_TOILET, details.getCondToilet());
+		values.put(Constants.DB_COLUMN_COMMENTS, details.getComments());
+		long id = database.insert(Constants.DB_TABLE_DETAILS, null, values);
+
+		notifyObservers();
+		return id;
+	}
+
 	private void notifyObservers() {
 		for (Observer observer : mObservers) {
 			observer.onDetailsChanged();
@@ -116,23 +118,15 @@ public class DetailsDataSource {
 	public void updateDetails(Details details) {
 		ContentValues values = new ContentValues();
 
-		if (details.getId() != -1) {
-			values.put(Constants.DB_COLUMN_ID, details.getId());
-		}
-
+		values.put(Constants.DB_COLUMN_ID, details.getId());
 		values.put(Constants.DB_COLUMN_NAME, details.getName());
 		values.put(Constants.DB_COLUMN_ADDRESS, details.getAddress());
-		values.put(Constants.DB_COLUMN_CONDITION_OVERALL,
-				details.getConditionOverall());
-		values.put(Constants.DB_COLUMN_CONDITION_KITCHEN,
-				details.getConditionKitchen());
-		values.put(Constants.DB_COLUMN_CONDITION_TOILET,
-				details.getConditionToilet());
+		values.put(Constants.DB_COLUMN_COND_OVERALL, details.getCondOverall());
+		values.put(Constants.DB_COLUMN_COND_KITCHEN, details.getCondKitchen());
+		values.put(Constants.DB_COLUMN_COND_TOILET, details.getCondToilet());
 		values.put(Constants.DB_COLUMN_COMMENTS, details.getComments());
-		values.put(Constants.DB_COLUMN_PHOTO, details.getPhoto());
-		long id = database.replace(Constants.DB_TABLE_DETAILS, null, values);
+		database.replace(Constants.DB_TABLE_DETAILS, null, values);
 
-		details.setId(id);
 		notifyObservers();
 	}
 

@@ -35,11 +35,9 @@ public class ItemsFragment extends ListFragment implements
 
 	@Override
 	public void onClick(View v) {
-		Details details = new Details(); // mDataSource.createDetails();
-
 		if (isDualPane()) {
 			Bundle args = new Bundle();
-			args.putSerializable("details", details);
+			args.putLong(Constants.ARG_ID, -1);
 
 			DetailsFragment detailsFragment = new DetailsFragment();
 			detailsFragment.setArguments(args);
@@ -51,7 +49,7 @@ public class ItemsFragment extends ListFragment implements
 		} else {
 			Intent intent = new Intent();
 			intent.setClass(getActivity(), DetailsActivity.class);
-			intent.putExtra("detailsId", details.getId());
+			intent.putExtra(Constants.ARG_ID, -1l);
 			startActivity(intent);
 		}
 	}
@@ -95,7 +93,7 @@ public class ItemsFragment extends ListFragment implements
 			getListView().setItemChecked(position, true);
 
 			Bundle args = new Bundle();
-			args.putSerializable("details", details);
+			args.putLong(Constants.ARG_ID, details.getId());
 			DetailsFragment detailsFragment = new DetailsFragment();
 			detailsFragment.setArguments(args);
 
@@ -106,7 +104,7 @@ public class ItemsFragment extends ListFragment implements
 		} else {
 			Intent intent = new Intent();
 			intent.setClass(getActivity(), DetailsActivity.class);
-			intent.putExtra("detailsId", details.getId());
+			intent.putExtra(Constants.ARG_ID, details.getId());
 			startActivity(intent);
 		}
 	}

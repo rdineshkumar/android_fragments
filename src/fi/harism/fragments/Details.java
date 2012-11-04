@@ -1,19 +1,14 @@
 package fi.harism.fragments;
 
-import java.io.Serializable;
-
-public class Details implements Serializable {
-
-	private static final long serialVersionUID = -8553876433947723956L;
+public class Details {
 
 	private String mAddress;
 	private String mComments;
-	private int mConditionKitchen;
-	private int mConditionOverall;
-	private int mConditionToilet;
+	private int mCondKitchen;
+	private int mCondOverall;
+	private int mCondToilet;
 	private long mId = -1;
 	private String mName;
-	private byte[] mPhoto;
 
 	public String getAddress() {
 		return mAddress;
@@ -23,16 +18,16 @@ public class Details implements Serializable {
 		return mComments;
 	}
 
-	public int getConditionKitchen() {
-		return mConditionKitchen;
+	public int getCondKitchen() {
+		return mCondKitchen;
 	}
 
-	public int getConditionOverall() {
-		return mConditionOverall;
+	public int getCondOverall() {
+		return mCondOverall;
 	}
 
-	public int getConditionToilet() {
-		return mConditionToilet;
+	public int getCondToilet() {
+		return mCondToilet;
 	}
 
 	public long getId() {
@@ -43,10 +38,6 @@ public class Details implements Serializable {
 		return mName;
 	}
 
-	public byte[] getPhoto() {
-		return mPhoto;
-	}
-
 	public void setAddress(String address) {
 		mAddress = address;
 	}
@@ -55,16 +46,16 @@ public class Details implements Serializable {
 		mComments = comments;
 	}
 
-	public void setConditionKitchen(int index) {
-		mConditionKitchen = index;
+	public void setCondKitchen(int index) {
+		mCondKitchen = index;
 	}
 
-	public void setConditionOverall(int index) {
-		mConditionOverall = index;
+	public void setCondOverall(int index) {
+		mCondOverall = index;
 	}
 
-	public void setConditionToilet(int index) {
-		mConditionToilet = index;
+	public void setCondToilet(int index) {
+		mCondToilet = index;
 	}
 
 	public void setId(long id) {
@@ -73,10 +64,6 @@ public class Details implements Serializable {
 
 	public void setName(String name) {
 		mName = name;
-	}
-
-	public void setPhoto(byte[] photo) {
-		mPhoto = photo;
 	}
 
 }

@@ -31,11 +31,10 @@ public class DetailsSQLiteHelper extends SQLiteOpenHelper {
 				" integer primary key autoincrement, ");
 		sb.append(Constants.DB_COLUMN_NAME).append(" text, ");
 		sb.append(Constants.DB_COLUMN_ADDRESS).append(" text, ");
-		sb.append(Constants.DB_COLUMN_CONDITION_OVERALL).append(" integer, ");
-		sb.append(Constants.DB_COLUMN_CONDITION_KITCHEN).append(" integer, ");
-		sb.append(Constants.DB_COLUMN_CONDITION_TOILET).append(" integer, ");
-		sb.append(Constants.DB_COLUMN_COMMENTS).append(" text, ");
-		sb.append(Constants.DB_COLUMN_PHOTO).append(" blob");
+		sb.append(Constants.DB_COLUMN_COND_OVERALL).append(" integer, ");
+		sb.append(Constants.DB_COLUMN_COND_KITCHEN).append(" integer, ");
+		sb.append(Constants.DB_COLUMN_COND_TOILET).append(" integer, ");
+		sb.append(Constants.DB_COLUMN_COMMENTS).append(" text");
 		sb.append(");");
 
 		database.execSQL(sb.toString());
