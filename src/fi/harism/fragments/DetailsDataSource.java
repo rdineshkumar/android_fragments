@@ -22,14 +22,12 @@ public class DetailsDataSource {
 		return mInstance;
 	}
 
-	private String[] allColumns = { DetailsSQLiteHelper.COLUMN_ID,
-			DetailsSQLiteHelper.COLUMN_NAME,
-			DetailsSQLiteHelper.COLUMN_ADDRESS,
-			DetailsSQLiteHelper.COLUMN_CONDITION_OVERALL,
-			DetailsSQLiteHelper.COLUMN_CONDITION_KITCHEN,
-			DetailsSQLiteHelper.COLUMN_CONDITION_TOILET,
-			DetailsSQLiteHelper.COLUMN_COMMENTS,
-			DetailsSQLiteHelper.COLUMN_PHOTO };
+	private String[] allColumns = { Constants.DB_COLUMN_ID,
+			Constants.DB_COLUMN_NAME, Constants.DB_COLUMN_ADDRESS,
+			Constants.DB_COLUMN_CONDITION_OVERALL,
+			Constants.DB_COLUMN_CONDITION_KITCHEN,
+			Constants.DB_COLUMN_CONDITION_TOILET, Constants.DB_COLUMN_COMMENTS,
+			Constants.DB_COLUMN_PHOTO };
 	private SQLiteDatabase database;
 	private DetailsSQLiteHelper dbHelper;
 	private Vector<Observer> mObservers = new Vector<Observer>();
@@ -70,17 +68,16 @@ public class DetailsDataSource {
 	}
 
 	public void deleteDetails(long id) {
-		database.delete(DetailsSQLiteHelper.TABLE_DETAILS,
-				DetailsSQLiteHelper.COLUMN_ID + " = " + id, null);
+		database.delete(Constants.DB_TABLE_DETAILS, Constants.DB_COLUMN_ID
+				+ " = " + id, null);
 		notifyObservers();
 	}
 
 	public List<Details> getAllDetails() {
 		List<Details> detailsList = new ArrayList<Details>();
 
-		Cursor cursor = database.query(DetailsSQLiteHelper.TABLE_DETAILS,
-				allColumns, null, null, null, null,
-				DetailsSQLiteHelper.COLUMN_NAME);
+		Cursor cursor = database.query(Constants.DB_TABLE_DETAILS, allColumns,
+				null, null, null, null, Constants.DB_COLUMN_NAME);
 
 		cursor.moveToFirst();
 		while (!cursor.isAfterLast()) {
@@ -94,9 +91,8 @@ public class DetailsDataSource {
 	}
 
 	public Details getDetails(long id) {
-		Cursor cursor = database.query(DetailsSQLiteHelper.TABLE_DETAILS,
-				allColumns, DetailsSQLiteHelper.COLUMN_ID + " = " + id, null,
-				null, null, null);
+		Cursor cursor = database.query(Constants.DB_TABLE_DETAILS, allColumns,
+				Constants.DB_COLUMN_ID + " = " + id, null, null, null, null);
 		cursor.moveToFirst();
 		Details details = cursorToDetails(cursor);
 		cursor.close();
@@ -121,21 +117,20 @@ public class DetailsDataSource {
 		ContentValues values = new ContentValues();
 
 		if (details.getId() != -1) {
-			values.put(DetailsSQLiteHelper.COLUMN_ID, details.getId());
+			values.put(Constants.DB_COLUMN_ID, details.getId());
 		}
 
-		values.put(DetailsSQLiteHelper.COLUMN_NAME, details.getName());
-		values.put(DetailsSQLiteHelper.COLUMN_ADDRESS, details.getAddress());
-		values.put(DetailsSQLiteHelper.COLUMN_CONDITION_OVERALL,
+		values.put(Constants.DB_COLUMN_NAME, details.getName());
+		values.put(Constants.DB_COLUMN_ADDRESS, details.getAddress());
+		values.put(Constants.DB_COLUMN_CONDITION_OVERALL,
 				details.getConditionOverall());
-		values.put(DetailsSQLiteHelper.COLUMN_CONDITION_KITCHEN,
+		values.put(Constants.DB_COLUMN_CONDITION_KITCHEN,
 				details.getConditionKitchen());
-		values.put(DetailsSQLiteHelper.COLUMN_CONDITION_TOILET,
+		values.put(Constants.DB_COLUMN_CONDITION_TOILET,
 				details.getConditionToilet());
-		values.put(DetailsSQLiteHelper.COLUMN_COMMENTS, details.getComments());
-		values.put(DetailsSQLiteHelper.COLUMN_PHOTO, details.getPhoto());
-		long id = database.replace(DetailsSQLiteHelper.TABLE_DETAILS, null,
-				values);
+		values.put(Constants.DB_COLUMN_COMMENTS, details.getComments());
+		values.put(Constants.DB_COLUMN_PHOTO, details.getPhoto());
+		long id = database.replace(Constants.DB_TABLE_DETAILS, null, values);
 
 		details.setId(id);
 		notifyObservers();

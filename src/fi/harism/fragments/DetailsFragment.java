@@ -10,7 +10,6 @@ import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,10 +24,10 @@ import android.widget.Toast;
 public class DetailsFragment extends Fragment implements View.OnClickListener {
 
 	private static final int ACTION_CODE = 100;
+	private static final File TEMP_PHOTO_FILE = new File(Constants.PHOTO_DIR,
+			"temp");
 
 	private Details mDetails;
-	private File mPhotoFile = new File(
-			Environment.getExternalStorageDirectory(), "fragment.jpg");
 
 	private boolean isDualPane() {
 		return getFragmentManager().findFragmentById(R.id.fragment_items) != null;
@@ -42,7 +41,7 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 			try {
 				int read;
 				byte[] buffer = new byte[8192];
-				FileInputStream fis = new FileInputStream(mPhotoFile);
+				FileInputStream fis = new FileInputStream(TEMP_PHOTO_FILE);
 				ByteArrayOutputStream bos = new ByteArrayOutputStream();
 				while ((read = fis.read(buffer)) != -1) {
 					bos.write(buffer, 0, read);
@@ -65,7 +64,8 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 		switch (view.getId()) {
 		case R.id.button_take_photo: {
 			Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-			intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(mPhotoFile));
+			intent.putExtra(MediaStore.EXTRA_OUTPUT,
+					Uri.fromFile(TEMP_PHOTO_FILE));
 			startActivityForResult(intent, ACTION_CODE);
 			break;
 		}
