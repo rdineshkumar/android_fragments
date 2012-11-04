@@ -16,7 +16,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 public class ItemsFragment extends ListFragment implements
-		DetailsDataSource.Observer {
+		View.OnClickListener, DetailsDataSource.Observer {
 
 	private DetailsDataSource mDataSource;
 
@@ -34,6 +34,29 @@ public class ItemsFragment extends ListFragment implements
 	}
 
 	@Override
+	public void onClick(View v) {
+		Details details = new Details(); // mDataSource.createDetails();
+
+		if (isDualPane()) {
+			Bundle args = new Bundle();
+			args.putSerializable("details", details);
+
+			DetailsFragment detailsFragment = new DetailsFragment();
+			detailsFragment.setArguments(args);
+
+			FragmentTransaction ft = getFragmentManager().beginTransaction();
+			ft.replace(R.id.details_container, detailsFragment);
+			ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+			ft.commit();
+		} else {
+			Intent intent = new Intent();
+			intent.setClass(getActivity(), DetailsActivity.class);
+			intent.putExtra("detailsId", details.getId());
+			startActivity(intent);
+		}
+	}
+
+	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mDataSource = DetailsDataSource.getInstance(getActivity());
@@ -44,6 +67,9 @@ public class ItemsFragment extends ListFragment implements
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_list, container, false);
+
+		view.findViewById(R.id.button_add).setOnClickListener(this);
+
 		onDetailsChanged();
 		return view;
 	}

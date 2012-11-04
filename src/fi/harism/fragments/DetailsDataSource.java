@@ -25,9 +25,10 @@ public class DetailsDataSource {
 	private String[] allColumns = { DetailsSQLiteHelper.COLUMN_ID,
 			DetailsSQLiteHelper.COLUMN_NAME,
 			DetailsSQLiteHelper.COLUMN_ADDRESS,
-			DetailsSQLiteHelper.COLUMN_PLANET1,
-			DetailsSQLiteHelper.COLUMN_PLANET2,
-			DetailsSQLiteHelper.COLUMN_PLANET3,
+			DetailsSQLiteHelper.COLUMN_CONDITION_OVERALL,
+			DetailsSQLiteHelper.COLUMN_CONDITION_KITCHEN,
+			DetailsSQLiteHelper.COLUMN_CONDITION_TOILET,
+			DetailsSQLiteHelper.COLUMN_COMMENTS,
 			DetailsSQLiteHelper.COLUMN_PHOTO };
 	private SQLiteDatabase database;
 	private DetailsSQLiteHelper dbHelper;
@@ -45,27 +46,26 @@ public class DetailsDataSource {
 		dbHelper.close();
 	}
 
-	public Details createDetails() {
-		ContentValues values = new ContentValues();
-		values.put(DetailsSQLiteHelper.COLUMN_NAME, "");
-		values.put(DetailsSQLiteHelper.COLUMN_ADDRESS, "");
-		long insertId = database.insert(DetailsSQLiteHelper.TABLE_DETAILS,
-				null, values);
-
-		notifyObservers();
-
-		return getDetails(insertId);
-	}
-
+	/*
+	 * public Details createDetails() { ContentValues values = new
+	 * ContentValues(); //values.put(DetailsSQLiteHelper.COLUMN_NAME, "");
+	 * //values.put(DetailsSQLiteHelper.COLUMN_ADDRESS, ""); long insertId =
+	 * database.insert(DetailsSQLiteHelper.TABLE_DETAILS, null, values);
+	 * 
+	 * notifyObservers();
+	 * 
+	 * return getDetails(insertId); }
+	 */
 	private Details cursorToDetails(Cursor cursor) {
 		Details details = new Details();
 		details.setId(cursor.getLong(0));
 		details.setName(cursor.getString(1));
 		details.setAddress(cursor.getString(2));
-		details.setPlanet1(cursor.getInt(3));
-		details.setPlanet2(cursor.getInt(4));
-		details.setPlanet3(cursor.getInt(5));
-		details.setPhoto(cursor.getBlob(6));
+		details.setConditionOverall(cursor.getInt(3));
+		details.setConditionKitchen(cursor.getInt(4));
+		details.setConditionToilet(cursor.getInt(5));
+		details.setComments(cursor.getString(6));
+		details.setPhoto(cursor.getBlob(7));
 		return details;
 	}
 
@@ -119,15 +119,25 @@ public class DetailsDataSource {
 
 	public void updateDetails(Details details) {
 		ContentValues values = new ContentValues();
-		values.put(DetailsSQLiteHelper.COLUMN_ID, details.getId());
+
+		if (details.getId() != -1) {
+			values.put(DetailsSQLiteHelper.COLUMN_ID, details.getId());
+		}
+
 		values.put(DetailsSQLiteHelper.COLUMN_NAME, details.getName());
 		values.put(DetailsSQLiteHelper.COLUMN_ADDRESS, details.getAddress());
-		values.put(DetailsSQLiteHelper.COLUMN_PLANET1, details.getPlanet1());
-		values.put(DetailsSQLiteHelper.COLUMN_PLANET2, details.getPlanet2());
-		values.put(DetailsSQLiteHelper.COLUMN_PLANET3, details.getPlanet3());
+		values.put(DetailsSQLiteHelper.COLUMN_CONDITION_OVERALL,
+				details.getConditionOverall());
+		values.put(DetailsSQLiteHelper.COLUMN_CONDITION_KITCHEN,
+				details.getConditionKitchen());
+		values.put(DetailsSQLiteHelper.COLUMN_CONDITION_TOILET,
+				details.getConditionToilet());
+		values.put(DetailsSQLiteHelper.COLUMN_COMMENTS, details.getComments());
 		values.put(DetailsSQLiteHelper.COLUMN_PHOTO, details.getPhoto());
-		database.replace(DetailsSQLiteHelper.TABLE_DETAILS, null, values);
+		long id = database.replace(DetailsSQLiteHelper.TABLE_DETAILS, null,
+				values);
 
+		details.setId(id);
 		notifyObservers();
 	}
 

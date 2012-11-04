@@ -7,15 +7,32 @@ public class Details implements Serializable {
 	private static final long serialVersionUID = -8553876433947723956L;
 
 	private String mAddress;
-	private long mId;
+	private String mComments;
+	private int mConditionKitchen;
+	private int mConditionOverall;
+	private int mConditionToilet;
+	private long mId = -1;
 	private String mName;
 	private byte[] mPhoto;
-	private int mPlanet1;
-	private int mPlanet2;
-	private int mPlanet3;
 
 	public String getAddress() {
 		return mAddress;
+	}
+
+	public String getComments() {
+		return mComments;
+	}
+
+	public int getConditionKitchen() {
+		return mConditionKitchen;
+	}
+
+	public int getConditionOverall() {
+		return mConditionOverall;
+	}
+
+	public int getConditionToilet() {
+		return mConditionToilet;
 	}
 
 	public long getId() {
@@ -30,20 +47,24 @@ public class Details implements Serializable {
 		return mPhoto;
 	}
 
-	public int getPlanet1() {
-		return mPlanet1;
-	}
-
-	public int getPlanet2() {
-		return mPlanet2;
-	}
-
-	public int getPlanet3() {
-		return mPlanet3;
-	}
-
 	public void setAddress(String address) {
 		mAddress = address;
+	}
+
+	public void setComments(String comments) {
+		mComments = comments;
+	}
+
+	public void setConditionKitchen(int index) {
+		mConditionKitchen = index;
+	}
+
+	public void setConditionOverall(int index) {
+		mConditionOverall = index;
+	}
+
+	public void setConditionToilet(int index) {
+		mConditionToilet = index;
 	}
 
 	public void setId(long id) {
@@ -56,18 +77,6 @@ public class Details implements Serializable {
 
 	public void setPhoto(byte[] photo) {
 		mPhoto = photo;
-	}
-
-	public void setPlanet1(int index) {
-		mPlanet1 = index;
-	}
-
-	public void setPlanet2(int index) {
-		mPlanet2 = index;
-	}
-
-	public void setPlanet3(int index) {
-		mPlanet3 = index;
 	}
 
 }

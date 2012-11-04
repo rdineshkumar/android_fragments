@@ -16,7 +16,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -55,7 +54,7 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 						Toast.LENGTH_LONG).show();
 			}
 
-			getArguments().putSerializable("details", mDetails);
+			storeDetails();
 
 			updatePhoto();
 		}
@@ -71,16 +70,7 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 			break;
 		}
 		case R.id.button_save: {
-			mDetails.setName(((EditText) getView().findViewById(
-					R.id.edittext_name)).getText().toString());
-			mDetails.setAddress(((EditText) getView().findViewById(
-					R.id.edittext_address)).getText().toString());
-			mDetails.setPlanet1(((Spinner) getView()
-					.findViewById(R.id.spinner1)).getSelectedItemPosition());
-			mDetails.setPlanet2(((Spinner) getView()
-					.findViewById(R.id.spinner2)).getSelectedItemPosition());
-			mDetails.setPlanet3(((Spinner) getView()
-					.findViewById(R.id.spinner3)).getSelectedItemPosition());
+			storeDetails();
 			DetailsDataSource.getInstance(getActivity())
 					.updateDetails(mDetails);
 			break;
@@ -116,39 +106,54 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 		view.findViewById(R.id.button_save).setOnClickListener(this);
 		view.findViewById(R.id.button_delete).setOnClickListener(this);
 
-		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-				getActivity(), R.array.planets_array,
-				android.R.layout.simple_spinner_item);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-		Spinner spinner1 = (Spinner) view.findViewById(R.id.spinner1);
-		spinner1.setAdapter(adapter);
-		spinner1.setSelection(mDetails.getPlanet1());
-
-		Spinner spinner2 = (Spinner) view.findViewById(R.id.spinner2);
-		spinner2.setAdapter(adapter);
-		spinner2.setSelection(mDetails.getPlanet2());
-
-		Spinner spinner3 = (Spinner) view.findViewById(R.id.spinner3);
-		spinner3.setAdapter(adapter);
-		spinner3.setSelection(mDetails.getPlanet3());
-
 		((TextView) view.findViewById(R.id.edittext_name)).setText(mDetails
 				.getName());
 		((TextView) view.findViewById(R.id.edittext_address)).setText(mDetails
 				.getAddress());
+		((Spinner) view.findViewById(R.id.spinner_overall))
+				.setSelection(mDetails.getConditionOverall());
+		((Spinner) view.findViewById(R.id.spinner_kitchen))
+				.setSelection(mDetails.getConditionKitchen());
+		((Spinner) view.findViewById(R.id.spinner_toilet))
+				.setSelection(mDetails.getConditionToilet());
+		((TextView) view.findViewById(R.id.edittext_comments)).setText(mDetails
+				.getComments());
 
 		view.getViewTreeObserver().addOnGlobalLayoutListener(
 				new ViewTreeObserver.OnGlobalLayoutListener() {
 					@Override
 					public void onGlobalLayout() {
-						getView().getViewTreeObserver()
-								.removeGlobalOnLayoutListener(this);
-						updatePhoto();
+						if (getView() != null) {
+							getView().getViewTreeObserver()
+									.removeGlobalOnLayoutListener(this);
+							updatePhoto();
+						}
 					}
 				});
 
 		return view;
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		storeDetails();
+	}
+
+	private void storeDetails() {
+		mDetails.setName(((EditText) getView().findViewById(R.id.edittext_name))
+				.getText().toString());
+		mDetails.setAddress(((EditText) getView().findViewById(
+				R.id.edittext_address)).getText().toString());
+		mDetails.setConditionOverall(((Spinner) getView().findViewById(
+				R.id.spinner_overall)).getSelectedItemPosition());
+		mDetails.setConditionKitchen(((Spinner) getView().findViewById(
+				R.id.spinner_kitchen)).getSelectedItemPosition());
+		mDetails.setConditionToilet(((Spinner) getView().findViewById(
+				R.id.spinner_toilet)).getSelectedItemPosition());
+		mDetails.setComments(((EditText) getView().findViewById(
+				R.id.edittext_comments)).getText().toString());
+		getArguments().putSerializable("details", mDetails);
 	}
 
 	private void updatePhoto() {

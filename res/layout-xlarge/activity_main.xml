@@ -17,11 +17,11 @@
         android:layout_height="match_parent"
         android:background="@drawable/bg_separator" />
 
-    <ScrollView
+    <LinearLayout
         android:id="@+id/details_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1" >
-    </ScrollView>
+    </LinearLayout>
 
 </LinearLayout>
