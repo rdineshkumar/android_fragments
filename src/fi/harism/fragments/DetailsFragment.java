@@ -46,14 +46,23 @@ import android.widget.Toast;
  */
 public class DetailsFragment extends Fragment implements View.OnClickListener {
 
+	// Camera activity code id.
 	private static final int ACTION_CODE = 100;
+	// Current details id.
 	private long mDetailsId = -1;
+	// Photo jpeg or png data.
 	private byte[] mPhotoData;
 
+	/**
+	 * Helper method for getting edit text content.
+	 */
 	private String getEditText(int id) {
 		return ((EditText) getView().findViewById(id)).getText().toString();
 	}
 
+	/**
+	 * Helper method for getting spinner value.
+	 */
 	private int getSpinner(int id) {
 		return ((Spinner) getView().findViewById(id)).getSelectedItemPosition();
 	}
@@ -69,7 +78,7 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 		if (requestCode == ACTION_CODE && resultCode == Activity.RESULT_OK) {
 			mPhotoData = readFile(Constants.PHOTO_TEMP);
 			Constants.PHOTO_TEMP.delete();
-			updatePhoto();
+			updatePhoto(mPhotoData);
 		}
 	}
 
@@ -156,7 +165,7 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 						if (getView() != null) {
 							getView().getViewTreeObserver()
 									.removeGlobalOnLayoutListener(this);
-							updatePhoto();
+							updatePhoto(mPhotoData);
 						}
 					}
 				});
@@ -171,6 +180,9 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 		outState.putLong(Constants.ARG_ID, mDetailsId);
 	}
 
+	/**
+	 * Helper method for reading file contents into byte array.
+	 */
 	private byte[] readFile(File file) {
 		try {
 			int read;
@@ -189,9 +201,14 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 		}
 	}
 
+	/**
+	 * Updates this fragment's details id.
+	 */
 	public void setDetailsId(long id) {
 		mDetailsId = id;
 
+		// NOTE: If getView() returns null this method will be called second
+		// time from onActivityCreated method.
 		if (getView() == null) {
 			return;
 		}
@@ -214,15 +231,24 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 		setEditText(R.id.edittext_comments, details.getComments());
 	}
 
+	/**
+	 * Helper method for setting EditText text.
+	 */
 	private void setEditText(int id, CharSequence text) {
 		((EditText) getView().findViewById(id)).setText(text);
 	}
 
+	/**
+	 * Helper method for setting spinner position.
+	 */
 	private void setSpinner(int id, int pos) {
 		((Spinner) getView().findViewById(id)).setSelection(pos);
 	}
 
-	public void setSpinnerStyle(View view, int id) {
+	/**
+	 * Updates spinner style for given spinner.
+	 */
+	private void setSpinnerStyle(View view, int id) {
 		Spinner spinner = (Spinner) view.findViewById(id);
 		spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
 			@Override
@@ -240,23 +266,25 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 				.setDropDownViewResource(R.layout.spinner_item);
 	}
 
-	private void updatePhoto() {
+	/**
+	 * Updates photo ImageView with given data.
+	 */
+	private void updatePhoto(byte[] data) {
 		ImageView imageView = (ImageView) getView()
 				.findViewById(R.id.imageview);
 		imageView.setImageBitmap(null);
 		int viewWidth = getView().getWidth();
 
-		if (mPhotoData != null && viewWidth != 0) {
+		if (data != null && viewWidth != 0) {
 			BitmapFactory.Options bounds = new BitmapFactory.Options();
 			bounds.inJustDecodeBounds = true;
-			BitmapFactory.decodeByteArray(mPhotoData, 0, mPhotoData.length,
-					bounds);
+			BitmapFactory.decodeByteArray(data, 0, data.length, bounds);
 
 			BitmapFactory.Options options = new BitmapFactory.Options();
 			options.inSampleSize = bounds.outWidth / viewWidth;
 
-			imageView.setImageBitmap(BitmapFactory.decodeByteArray(mPhotoData,
-					0, mPhotoData.length, options));
+			imageView.setImageBitmap(BitmapFactory.decodeByteArray(data, 0,
+					data.length, options));
 		}
 	}
 
