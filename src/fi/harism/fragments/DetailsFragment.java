@@ -16,9 +16,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class DetailsFragment extends Fragment implements View.OnClickListener {
@@ -118,6 +122,10 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 		View view = inflater.inflate(R.layout.fragment_details, container,
 				false);
 
+		setSpinnerStyle(view, R.id.spinner_overall);
+		setSpinnerStyle(view, R.id.spinner_kitchen);
+		setSpinnerStyle(view, R.id.spinner_toilet);
+
 		view.findViewById(R.id.button_take_photo).setOnClickListener(this);
 		view.findViewById(R.id.button_save).setOnClickListener(this);
 		view.findViewById(R.id.button_delete).setOnClickListener(this);
@@ -193,6 +201,24 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 
 	private void setSpinner(int id, int pos) {
 		((Spinner) getView().findViewById(id)).setSelection(pos);
+	}
+
+	public void setSpinnerStyle(View view, int id) {
+		Spinner spinner = (Spinner) view.findViewById(id);
+		spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view,
+					int pos, long id) {
+				((TextView) parent.getChildAt(0)).setTextSize(20f);
+				parent.requestLayout();
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) {
+			}
+		});
+		((ArrayAdapter<?>) spinner.getAdapter())
+				.setDropDownViewResource(R.layout.spinner_item);
 	}
 
 	private void updatePhoto() {
