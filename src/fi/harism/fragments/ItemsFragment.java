@@ -1,3 +1,19 @@
+/*
+   Copyright 2012 Harri Smatt
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+ */
+
 package fi.harism.fragments;
 
 import java.util.List;
@@ -15,14 +31,21 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+/**
+ * List fragment containing list of details in database.
+ */
 public class ItemsFragment extends ListFragment implements
 		View.OnClickListener, DetailsDataSource.Observer {
 
+	// Local instance of data source.
 	private DetailsDataSource mDataSource;
 
+	/**
+	 * Helper method to determine whether we are in dual pane mode.
+	 */
 	private boolean isDualPane() {
-		View details = getActivity().findViewById(R.id.details_container);
-		return details != null && details.getVisibility() == View.VISIBLE;
+		View container = getActivity().findViewById(R.id.details_container);
+		return container != null && container.getVisibility() == View.VISIBLE;
 	}
 
 	@Override
@@ -36,12 +59,14 @@ public class ItemsFragment extends ListFragment implements
 	@Override
 	public void onClick(View v) {
 		if (isDualPane()) {
+			// Open new empty details fragment.
 			DetailsFragment detailsFragment = new DetailsFragment();
 			FragmentTransaction ft = getFragmentManager().beginTransaction();
 			ft.setCustomAnimations(R.animator.in, R.animator.out);
 			ft.replace(R.id.details_container, detailsFragment, "details");
 			ft.commit();
 		} else {
+			// Start new empty details activity.
 			Intent intent = new Intent();
 			intent.setClass(getActivity(), DetailsActivity.class);
 			intent.putExtra(Constants.ARG_ID, -1l);
@@ -85,8 +110,6 @@ public class ItemsFragment extends ListFragment implements
 		Details details = (Details) getListAdapter().getItem(position);
 
 		if (isDualPane()) {
-			getListView().setItemChecked(position, true);
-
 			DetailsFragment detailsFragment = new DetailsFragment();
 			FragmentTransaction ft = getFragmentManager().beginTransaction();
 			ft.setCustomAnimations(R.animator.in, R.animator.out);
@@ -102,6 +125,9 @@ public class ItemsFragment extends ListFragment implements
 		}
 	}
 
+	/**
+	 * Private adapter class for ListView.
+	 */
 	private class DetailsAdapter extends ArrayAdapter<Details> {
 
 		public DetailsAdapter(Context context, List<Details> objects) {
@@ -122,7 +148,6 @@ public class ItemsFragment extends ListFragment implements
 
 			return view;
 		}
-
 	}
 
 }
