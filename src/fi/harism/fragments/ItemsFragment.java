@@ -71,6 +71,7 @@ public class ItemsFragment extends ListFragment implements
 			intent.setClass(getActivity(), DetailsActivity.class);
 			intent.putExtra(Constants.ARG_ID, -1l);
 			startActivity(intent);
+			getActivity().overridePendingTransition(R.anim.in, R.anim.keep);
 		}
 	}
 

@@ -183,7 +183,7 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 	private byte[] readFile(File file) {
 		try {
 			int read;
-			byte[] buffer = new byte[8192];
+			byte[] buffer = new byte[65536];
 			FileInputStream fis = new FileInputStream(file);
 			ByteArrayOutputStream bos = new ByteArrayOutputStream();
 			while ((read = fis.read(buffer)) != -1) {
