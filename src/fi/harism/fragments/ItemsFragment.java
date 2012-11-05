@@ -59,7 +59,7 @@ public class ItemsFragment extends ListFragment implements
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.fragment_list, container, false);
+		View view = inflater.inflate(R.layout.fragment_items, container, false);
 
 		view.findViewById(R.id.button_add).setOnClickListener(this);
 
@@ -105,7 +105,7 @@ public class ItemsFragment extends ListFragment implements
 	private class DetailsAdapter extends ArrayAdapter<Details> {
 
 		public DetailsAdapter(Context context, List<Details> objects) {
-			super(context, R.layout.fragment_list_item, objects);
+			super(context, R.layout.fragment_items_item, objects);
 		}
 
 		@Override
@@ -113,7 +113,7 @@ public class ItemsFragment extends ListFragment implements
 			Details details = getItem(position);
 
 			View view = getActivity().getLayoutInflater().inflate(
-					R.layout.fragment_list_item, null, false);
+					R.layout.fragment_items_item, null, false);
 
 			((TextView) view.findViewById(R.id.textview_name)).setText(details
 					.getName());
