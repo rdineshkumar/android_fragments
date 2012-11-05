@@ -32,8 +32,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -150,10 +148,6 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 		View view = inflater.inflate(R.layout.fragment_details, container,
 				false);
 
-		setSpinnerStyle(view, R.id.spinner_overall);
-		setSpinnerStyle(view, R.id.spinner_kitchen);
-		setSpinnerStyle(view, R.id.spinner_toilet);
-
 		view.findViewById(R.id.button_take_photo).setOnClickListener(this);
 		view.findViewById(R.id.button_save).setOnClickListener(this);
 		view.findViewById(R.id.button_delete).setOnClickListener(this);
@@ -165,6 +159,9 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 						if (getView() != null) {
 							getView().getViewTreeObserver()
 									.removeGlobalOnLayoutListener(this);
+							setSpinnerStyle(R.id.spinner_overall);
+							setSpinnerStyle(R.id.spinner_kitchen);
+							setSpinnerStyle(R.id.spinner_toilet);
 							updatePhoto(mPhotoData);
 						}
 					}
@@ -207,7 +204,7 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 	public void setDetailsId(long id) {
 		mDetailsId = id;
 
-		// NOTE: If getView() returns null this method will be called second
+		// TODO: If getView() returns null this method will be called second
 		// time from onActivityCreated method.
 		if (getView() == null) {
 			return;
@@ -248,20 +245,9 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 	/**
 	 * Updates spinner style for given spinner.
 	 */
-	private void setSpinnerStyle(View view, int id) {
-		Spinner spinner = (Spinner) view.findViewById(id);
-		spinner.setOnItemSelectedListener(new OnItemSelectedListener() {
-			@Override
-			public void onItemSelected(AdapterView<?> parent, View view,
-					int pos, long id) {
-				((TextView) parent.getChildAt(0)).setTextSize(20f);
-				parent.requestLayout();
-			}
-
-			@Override
-			public void onNothingSelected(AdapterView<?> parent) {
-			}
-		});
+	private void setSpinnerStyle(int id) {
+		Spinner spinner = (Spinner) getView().findViewById(id);
+		((TextView) spinner.findViewById(android.R.id.text1)).setTextSize(20f);
 		((ArrayAdapter<?>) spinner.getAdapter())
 				.setDropDownViewResource(R.layout.spinner_item);
 	}
