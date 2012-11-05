@@ -111,12 +111,14 @@ public class ItemsFragment extends ListFragment implements
 		Details details = (Details) getListAdapter().getItem(position);
 
 		if (isDualPane()) {
+			Bundle args = new Bundle();
+			args.putLong(Constants.ARG_ID, details.getId());
 			DetailsFragment detailsFragment = new DetailsFragment();
+			detailsFragment.setArguments(args);
 			FragmentTransaction ft = getFragmentManager().beginTransaction();
 			ft.setCustomAnimations(R.animator.in, R.animator.out);
 			ft.replace(R.id.details_container, detailsFragment, "details");
 			ft.commit();
-			detailsFragment.setDetailsId(details.getId());
 		} else {
 			Intent intent = new Intent();
 			intent.setClass(getActivity(), DetailsActivity.class);

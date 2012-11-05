@@ -68,7 +68,7 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-		setDetailsId(mDetailsId);
+		setDetails(mDetailsId);
 	}
 
 	@Override
@@ -136,9 +136,23 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 		super.onCreate(savedInstanceState);
 		setRetainInstance(true);
 
-		if (savedInstanceState != null) {
-			mDetailsId = savedInstanceState.getLong(Constants.ARG_ID);
-			mPhotoData = savedInstanceState.getByteArray(Constants.ARG_PHOTO);
+		Bundle args = savedInstanceState;
+		if (getArguments() != null) {
+			args = getArguments();
+		}
+		if (args == null) {
+			args = getActivity().getIntent().getExtras();
+		}
+
+		if (args != null) {
+			mDetailsId = args.getLong(Constants.ARG_ID, -1);
+
+			if (args.getBoolean(Constants.ARG_KEEP)) {
+				mPhotoData = args.getByteArray(Constants.ARG_PHOTO);
+			} else {
+				mPhotoData = readFile(new File(Constants.PHOTO_DIR,
+						Constants.PHOTO_PREFIX + mDetailsId));
+			}
 		}
 	}
 
@@ -173,8 +187,9 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putByteArray(Constants.ARG_PHOTO, mPhotoData);
+		outState.putBoolean(Constants.ARG_KEEP, true);
 		outState.putLong(Constants.ARG_ID, mDetailsId);
+		outState.putByteArray(Constants.ARG_PHOTO, mPhotoData);
 	}
 
 	/**
@@ -199,25 +214,15 @@ public class DetailsFragment extends Fragment implements View.OnClickListener {
 	}
 
 	/**
-	 * Updates this fragment's details id.
+	 * Updates this fragment's details.
 	 */
-	public void setDetailsId(long id) {
-		mDetailsId = id;
-
-		// TODO: If getView() returns null this method will be called second
-		// time from onActivityCreated method.
-		if (getView() == null) {
-			return;
-		}
-
+	private void setDetails(long id) {
 		Details details;
 		if (id == -1) {
 			details = new Details();
 		} else {
 			details = DetailsDataSource.getInstance(getActivity()).getDetails(
 					id);
-			mPhotoData = readFile(new File(Constants.PHOTO_DIR,
-					Constants.PHOTO_PREFIX + id));
 		}
 
 		setEditText(R.id.edittext_name, details.getName());

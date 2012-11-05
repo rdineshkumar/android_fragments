@@ -42,20 +42,6 @@ public class DetailsActivity extends Activity {
 		getWindow().setSoftInputMode(
 				WindowManager.LayoutParams.SOFT_INPUT_STATE_UNCHANGED);
 		setContentView(R.layout.activity_details);
-
-		if (savedInstanceState == null
-				|| !savedInstanceState.getBoolean(Constants.ARG_KEEP)) {
-			DetailsFragment detailsFragment = (DetailsFragment) getFragmentManager()
-					.findFragmentByTag("details");
-			detailsFragment.setDetailsId(getIntent().getLongExtra(
-					Constants.ARG_ID, -1));
-		}
-	}
-
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		outState.putBoolean(Constants.ARG_KEEP, true);
 	}
 
 }
